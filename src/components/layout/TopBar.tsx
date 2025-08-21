@@ -1,6 +1,7 @@
 import { Box } from '@mui/material';
+import { JSX } from 'react';
 
-export default function TopBar({ onMenuClick }: { onMenuClick?: () => void }) {
+export default function TopBar({ onMenuClick }: { onMenuClick?: () => void }): JSX.Element {
   return (
     <Box
       sx={{

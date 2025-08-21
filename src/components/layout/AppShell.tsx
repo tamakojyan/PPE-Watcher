@@ -15,6 +15,7 @@ export default function AppShell() {
     <Box sx={{ display: 'flex', minHeight: '100vh' }}>
       <CssBaseline />
       <TopBar onMenuClick={toggleDrawer} />
+      <SideNav mobileOpen={mobileOpen} onClose={toggleDrawer} />
     </Box>
   );
 }
