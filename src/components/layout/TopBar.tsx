@@ -1,7 +1,13 @@
-import { Box } from '@mui/material';
-import { JSX } from 'react';
-
-export default function TopBar({ onMenuClick }: { onMenuClick?: () => void }): JSX.Element {
+import { AppBar, IconButton, Toolbar, Typography, Box, Tooltip } from '@mui/material';
+import MenuIcon from '@mui/icons-material/Menu';
+import DarkModeIcon from '@mui/icons-material/DarkMode';
+import LightModeIcon from '@mui/icons-material/LightMode';
+type Props = {
+  onMenuClick: () => void;
+  onToggleTheme?: () => void;
+  title?: string;
+};
+export default function TopBar({ onMenuClick, onToggleTheme, title }: Props): React.ReactElement {
   return (
     <Box
       sx={{

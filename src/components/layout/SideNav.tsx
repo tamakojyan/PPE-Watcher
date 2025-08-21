@@ -9,11 +9,14 @@ import {
   Divider,
   Box,
 } from '@mui/material';
-import { JSX } from 'react';
 type props = {
   mobileOpen: boolean;
   onClose: () => void;
 };
-export default function SideNav({ mobileOpen, onClose }: props): JSX.Element {
+
+const drawerWidth = 240;
+export default function SideNav({ mobileOpen, onClose }: props): React.ReactElement {
   return <Box></Box>;
 }
+
+export { drawerWidth };
