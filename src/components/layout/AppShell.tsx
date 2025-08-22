@@ -7,15 +7,15 @@ import SideNav, { drawerWidth } from './SideNav';
 import Footer from './Footer';
 
 export default function AppShell(): React.ReactElement {
-  const useMQ = useMediaQuery(theme.breakpoints.down('md'));
   const [mobileOpen, setMobileOpen] = useState(false);
-
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   const toggleDrawer = () => setMobileOpen((p) => !p);
 
   return (
     <Box sx={{ display: 'flex', minHeight: '100vh' }}>
       <CssBaseline />
-      <TopBar onMenuClick={toggleDrawer} onToggleTheme={toggleTheme} title={'PPE Watcher'} />
+      <TopBar onMenuClick={toggleDrawer} title={'PPE Watcher'} isMobile={isMobile} />
       <SideNav mobileOpen={mobileOpen} onClose={toggleDrawer} />
       {/*MainContent*/}
       <Box

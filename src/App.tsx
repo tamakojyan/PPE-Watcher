@@ -1,12 +1,16 @@
 import router from './app/routes';
 import { RouterProvider } from 'react-router-dom';
 import { ThemeProvider } from '@mui/material/styles';
-import { CssBaseline, createTheme } from '@mui/material';
+import { CssBaseline, createTheme, useMediaQuery } from '@mui/material';
 import { useState, useMemo } from 'react';
 import { createContext, useContext } from 'react';
 
-export const ThemeControlContext = createContext(toggleTheme:()=>void);
-
+export const ThemeControlContext = createContext<{ toggleTheme: () => void } | null>(null);
+export const useThemeControl = () => {
+  const ctx = useContext(ThemeControlContext);
+  if (!ctx) throw new Error('useThemeControl must be used  within ThemeControlContext.provider ');
+  return ctx;
+};
 export default function App() {
   const [isDark, setIsDark] = useState(false);
   const theme = useMemo(
@@ -15,9 +19,12 @@ export default function App() {
   );
   const toggleTheme = () => setIsDark((p) => !p);
 
-  return(  <ThemeProvider theme={theme}>
-      <CssBaseline/>
-      <RouterProvider router={router} />;
-    </ThemeProvider>)
-
+  return (
+    <ThemeProvider theme={theme}>
+      <CssBaseline />
+      <ThemeControlContext.Provider value={{ toggleTheme }}>
+        <RouterProvider router={router} />
+      </ThemeControlContext.Provider>
+    </ThemeProvider>
+  );
 }

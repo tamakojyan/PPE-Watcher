@@ -2,22 +2,52 @@ import { AppBar, IconButton, Toolbar, Typography, Box, Tooltip } from '@mui/mate
 import MenuIcon from '@mui/icons-material/Menu';
 import DarkModeIcon from '@mui/icons-material/DarkMode';
 import LightModeIcon from '@mui/icons-material/LightMode';
+import { useThemeControl } from '../../App';
+import { useTheme } from '@mui/material/styles';
+import logoUrlD from '../../assets/images/Logo-Dark.png';
+import logoUrlL from '../../assets/images/Logo-Light.png';
+
 type Props = {
   onMenuClick: () => void;
-  onToggleTheme?: () => void;
   title?: string;
+  isMobile: boolean;
 };
-export default function TopBar({ onMenuClick, onToggleTheme, title }: Props): React.ReactElement {
+export default function TopBar({ onMenuClick, isMobile, title }: Props): React.ReactElement {
+  const { toggleTheme } = useThemeControl();
+  const theme = useTheme();
+  const isDark = theme.palette.mode === 'dark';
   return (
-    <Box
-      sx={{
-        height: 64,
-        bgcolor: 'primary.main',
-        display: 'flex',
-        color: 'white',
-        alignItems: 'center',
-        px: 2,
-      }}
-    ></Box>
+    <AppBar position="fixed" color="primary" enableColorOnDark>
+      <Toolbar sx={{ gap: 1 }}>
+        {isMobile && (
+          <Tooltip title={'Menu'}>
+            <IconButton edge="start" color="inherit" onClick={onMenuClick}>
+              <MenuIcon />
+            </IconButton>
+          </Tooltip>
+        )}
+        <Typography
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            variant: 'h6',
+            flexGrow: 1,
+          }}
+          noWrap
+        >
+          <img
+            src={isDark ? logoUrlD : logoUrlL}
+            alt="Logo"
+            style={{ height: 40, marginRight: 8 }}
+          />
+          {title ?? 'PPE-Watcher'}
+        </Typography>
+        <Tooltip title={isDark ? 'Switch to light' : 'Switch to dark'}>
+          <IconButton color="inherit" onClick={toggleTheme} aria-label="toggle theme">
+            {isDark ? <LightModeIcon /> : <DarkModeIcon />}
+          </IconButton>
+        </Tooltip>
+      </Toolbar>
+    </AppBar>
   );
 }
