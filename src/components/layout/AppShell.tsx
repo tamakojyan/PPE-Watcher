@@ -5,6 +5,7 @@ import { useState } from 'react';
 import TopBar from './TopBar';
 import SideNav, { drawerWidth } from './SideNav';
 import Footer from './Footer';
+import MainNav from './MainNav';
 
 export default function AppShell(): React.ReactElement {
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -16,6 +17,7 @@ export default function AppShell(): React.ReactElement {
     <Box sx={{ display: 'flex', minHeight: '100vh' }}>
       <CssBaseline />
       <TopBar onMenuClick={toggleDrawer} title={'PPE Watcher'} isMobile={isMobile} />
+      <MainNav isMobile={isMobile} />
       <SideNav mobileOpen={mobileOpen} onClose={toggleDrawer} />
       {/*MainContent*/}
       <Box
@@ -23,14 +25,22 @@ export default function AppShell(): React.ReactElement {
         sx={{
           flexGrow: 1,
           p: 2,
-          width: { md: `calc(100%-${drawerWidth})` },
+          ml: { md: `${drawerWidth}px` },
           display: 'flex',
           flexDirection: 'column',
         }}
       >
         {/*PlaceHolder*/}
+        {isMobile || <Toolbar />}
         <Toolbar />
-        <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
+        <Box
+          sx={{
+            flex: 1,
+            display: 'flex',
+            flexDirection: 'column',
+            bgcolor: 'pink',
+          }}
+        >
           <Outlet />
         </Box>
         <Footer />

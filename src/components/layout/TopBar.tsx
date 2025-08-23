@@ -17,11 +17,16 @@ export default function TopBar({ onMenuClick, isMobile, title }: Props): React.R
   const theme = useTheme();
   const isDark = theme.palette.mode === 'dark';
   return (
-    <AppBar position="fixed" color="primary" enableColorOnDark>
+    <AppBar position="fixed" color="primary" elevation={0} enableColorOnDark>
       <Toolbar sx={{ gap: 1 }}>
         {isMobile && (
           <Tooltip title={'Menu'}>
-            <IconButton edge="start" color="inherit" onClick={onMenuClick}>
+            <IconButton
+              edge="start"
+              color="inherit"
+              sx={{ color: 'rgba(2, 30, 70)' }}
+              onClick={onMenuClick}
+            >
               <MenuIcon />
             </IconButton>
           </Tooltip>

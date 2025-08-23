@@ -12,7 +12,7 @@ const routes: RouteObject[] = [
     path: '/',
     element: <AppShell />,
     children: [
-      { path: 'dashboard', element: <Dashboard /> },
+      { index: true, element: <Dashboard /> },
       { path: 'history', element: <History /> },
       { path: 'settings', element: <Settings /> },
       { path: 'notfound', element: <NotFound /> },
