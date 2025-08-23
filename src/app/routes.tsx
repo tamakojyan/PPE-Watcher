@@ -1,10 +1,23 @@
-import { createBrowserRouter, RouteObject } from 'react-router-dom';
+import { createBrowserRouter, RouteObject, Navigate } from 'react-router-dom';
+
+// 直接从“分组文件夹”里导入组件
+import Overview from 'pages/Dashboard/Overview';
+import LiveFeed from 'pages/Dashboard/LiveFeed';
+import Alerts from 'pages/Dashboard/Alerts';
+
+import SearchViolations from 'pages/History/SearchViolations';
+import Archive from 'pages/History/Archive';
+import Snapshots from 'pages/History/Snapshots';
+import Reports from 'pages/History/Reports';
+
+import AlertsSettings from 'pages/Settings/AlertsSettings';
+import Contacts from 'pages/Settings/Contacts';
+import SenderConfig from 'pages/Settings/SenderConfig';
+import Security from 'pages/Settings/Security';
+
 import AppShell from 'components/layout/AppShell';
-import Dashboard from 'pages/Dashboard';
 import Login from 'pages/Login';
-import History from 'pages/History';
 import NotFound from 'pages/NotFound';
-import Settings from 'pages/Settings';
 
 const routes: RouteObject[] = [
   { path: '/login', element: <Login /> },
@@ -12,13 +25,28 @@ const routes: RouteObject[] = [
     path: '/',
     element: <AppShell />,
     children: [
-      { index: true, element: <Dashboard /> },
-      { path: 'history', element: <History /> },
-      { path: 'settings', element: <Settings /> },
-      { path: 'notfound', element: <NotFound /> },
+      { index: true, element: <Navigate to="/overview" replace /> },
+
+      // Dashboard group (flat URLs)
+      { path: 'overview', element: <Overview /> },
+      { path: 'live', element: <LiveFeed /> },
+      { path: 'alerts', element: <Alerts /> },
+
+      // History group (flat URLs)
+      { path: 'violations', element: <SearchViolations /> },
+      { path: 'archive', element: <Archive /> },
+      { path: 'snapshots', element: <Snapshots /> },
+      { path: 'reports', element: <Reports /> },
+
+      // Settings group (flat URLs)
+      { path: 'alerts-settings', element: <AlertsSettings /> },
+      { path: 'contacts', element: <Contacts /> },
+      { path: 'sender', element: <SenderConfig /> },
+      { path: 'security', element: <Security /> },
+
+      { path: '*', element: <NotFound /> },
     ],
   },
 ];
 
-const router = createBrowserRouter(routes);
-export default router;
+export default createBrowserRouter(routes);

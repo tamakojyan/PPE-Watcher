@@ -17,8 +17,8 @@ export default function AppShell(): React.ReactElement {
     <Box sx={{ display: 'flex', minHeight: '100vh' }}>
       <CssBaseline />
       <TopBar onMenuClick={toggleDrawer} title={'PPE Watcher'} isMobile={isMobile} />
-      <MainNav isMobile={isMobile} />
-      <SideNav mobileOpen={mobileOpen} onClose={toggleDrawer} />
+      {isMobile || <MainNav isMobile={isMobile} />}
+
       {/*MainContent*/}
       <Box
         component="main"
@@ -28,11 +28,14 @@ export default function AppShell(): React.ReactElement {
           ml: { md: `${drawerWidth}px` },
           display: 'flex',
           flexDirection: 'column',
+          zIndex: (t) => t.zIndex.appBar - 2,
         }}
       >
         {/*PlaceHolder*/}
         {isMobile || <Toolbar />}
         <Toolbar />
+        {isMobile || <SideNav isMobile={isMobile} />}
+
         <Box
           sx={{
             flex: 1,
@@ -43,7 +46,7 @@ export default function AppShell(): React.ReactElement {
         >
           <Outlet />
         </Box>
-        <Footer />
+        <Footer Company="SafeVision Inc." Version="1.0" />
       </Box>
     </Box>
   );
