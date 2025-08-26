@@ -1,3 +1,3 @@
-export default function History() {
-  return <div>This is a History page</div>;
+export default function Security() {
+  return <div>This is a Security page</div>;
 }

@@ -33,7 +33,7 @@ export default function MainNav({ isMobile }: Props): React.ReactElement | null 
 
   const handleChange = (_: React.SyntheticEvent, nextKey: MainKey) => {
     const target = Main.find((m) => m.key === nextKey)!;
-    navigate(target.defaultPath); // 切到该组的默认子页
+    navigate(target.defaultPath);
   };
 
   return (

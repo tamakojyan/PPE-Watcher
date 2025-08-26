@@ -1,3 +1,3 @@
-export default function History() {
-  return <div>This is a History page</div>;
+export default function SenderConfig() {
+  return <div>This is a SenderConfig page</div>;
 }

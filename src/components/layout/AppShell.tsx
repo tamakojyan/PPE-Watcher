@@ -6,12 +6,14 @@ import TopBar from './TopBar';
 import SideNav, { drawerWidth } from './SideNav';
 import Footer from './Footer';
 import MainNav from './MainNav';
+import MobileMenu from './MobileMenu';
 
 export default function AppShell(): React.ReactElement {
   const [mobileOpen, setMobileOpen] = useState(false);
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   const toggleDrawer = () => setMobileOpen((p) => !p);
+  const closeDrawer = () => setMobileOpen(false);
 
   return (
     <Box sx={{ display: 'flex', minHeight: '100vh' }}>
@@ -23,12 +25,13 @@ export default function AppShell(): React.ReactElement {
       <Box
         component="main"
         sx={{
-          flexGrow: 1,
+          flex: 1,
           p: 2,
           ml: { md: `${drawerWidth}px` },
           display: 'flex',
           flexDirection: 'column',
           zIndex: (t) => t.zIndex.appBar - 2,
+          overflow: 'hidden',
         }}
       >
         {/*PlaceHolder*/}
@@ -39,6 +42,7 @@ export default function AppShell(): React.ReactElement {
         <Box
           sx={{
             flex: 1,
+            minHeight: 0,
             display: 'flex',
             flexDirection: 'column',
             bgcolor: 'pink',
@@ -48,6 +52,7 @@ export default function AppShell(): React.ReactElement {
         </Box>
         <Footer Company="SafeVision Inc." Version="1.0" />
       </Box>
+      <MobileMenu open={mobileOpen} onClose={closeDrawer} title="PPE Watcher" />
     </Box>
   );
 }

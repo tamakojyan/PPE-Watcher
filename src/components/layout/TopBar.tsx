@@ -6,6 +6,7 @@ import { useThemeControl } from '../../App';
 import { useTheme } from '@mui/material/styles';
 import logoUrlD from '../../assets/images/Logo-Dark.png';
 import logoUrlL from '../../assets/images/Logo-Light.png';
+import { useNavigate } from 'react-router-dom';
 
 type Props = {
   onMenuClick: () => void;
@@ -13,6 +14,7 @@ type Props = {
   isMobile: boolean;
 };
 export default function TopBar({ onMenuClick, isMobile, title }: Props): React.ReactElement {
+  const navigate = useNavigate();
   const { toggleTheme } = useThemeControl();
   const theme = useTheme();
   const isDark = theme.palette.mode === 'dark';
@@ -20,7 +22,6 @@ export default function TopBar({ onMenuClick, isMobile, title }: Props): React.R
     <AppBar position="fixed" color="primary" elevation={0} enableColorOnDark>
       <Toolbar sx={{ gap: 1 }}>
         <Box sx={{ display: 'flex', alignItems: 'center', flex: 1, gap: 1 }}>
-          {' '}
           {isMobile && (
             <Tooltip title={'Menu'}>
               <IconButton
@@ -39,7 +40,12 @@ export default function TopBar({ onMenuClick, isMobile, title }: Props): React.R
               alignItems: 'center',
               variant: 'h6',
               flexGrow: 1,
+              transition: 'color 0.2 ease transform 0.1 ease ',
+              transformOrigin: 'left center',
+              '&:hover': { color: 'aqua' },
+              '&:active': { transform: 'scale(0.98)' },
             }}
+            onClick={() => navigate('/overview')}
             noWrap
           >
             <img
