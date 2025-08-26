@@ -6,9 +6,9 @@ import LiveFeed from 'pages/Dashboard/LiveFeed';
 import Alerts from 'pages/Dashboard/Alerts';
 
 import SearchViolations from 'pages/History/SearchViolations';
-import Archive from 'pages/History/Archive';
-import Snapshots from 'pages/History/Snapshots';
-import Reports from 'pages/History/Reports';
+import Trends from 'pages/History/Trends';
+import Notifications from 'pages/History/Notifications';
+import Bookmarks from 'pages/History/Bookmarks';
 
 import AlertsSettings from 'pages/Settings/AlertsSettings';
 import Contacts from 'pages/Settings/Contacts';
@@ -34,9 +34,9 @@ const routes: RouteObject[] = [
 
       // History group (flat URLs)
       { path: 'violations', element: <SearchViolations /> },
-      { path: 'archive', element: <Archive /> },
-      { path: 'snapshots', element: <Snapshots /> },
-      { path: 'reports', element: <Reports /> },
+      { path: 'trends', element: <Trends /> },
+      { path: 'notifications', element: <Notifications /> },
+      { path: 'bookmarks', element: <Bookmarks /> },
 
       // Settings group (flat URLs)
       { path: 'alerts-settings', element: <AlertsSettings /> },

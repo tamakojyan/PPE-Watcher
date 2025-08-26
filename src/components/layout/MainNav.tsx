@@ -12,7 +12,7 @@ type MainKey = (typeof Main)[number]['key'];
 
 const GROUPS: Record<MainKey, Set<string>> = {
   dashboard: new Set(['overview', 'live', 'alerts']),
-  history: new Set(['violations', 'archive', 'snapshots', 'reports']),
+  history: new Set(['violations', 'trends', 'notifications', 'bookmarks']),
   settings: new Set(['alerts-settings', 'contacts', 'sender', 'security']),
 };
 

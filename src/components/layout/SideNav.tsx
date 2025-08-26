@@ -12,7 +12,7 @@ type MainKey = 'dashboard' | 'history' | 'settings';
 
 const GROUPS: Record<MainKey, Set<string>> = {
   dashboard: new Set(['overview', 'live', 'alerts']),
-  history: new Set(['violations', 'archive', 'snapshots', 'reports']),
+  history: new Set(['violations', 'trends', 'notifications', 'bookmarks']),
   settings: new Set(['alerts-settings', 'contacts', 'sender', 'security']),
 };
 
@@ -31,9 +31,9 @@ const SUB_ITEMS: Record<MainKey, { to: string; label: string }[]> = {
   ],
   history: [
     { to: '/violations', label: 'Search Violations' },
-    { to: '/archive', label: 'Archive' },
-    { to: '/snapshots', label: 'Snapshots' },
-    { to: '/reports', label: 'Reports' },
+    { to: '/trends', label: 'Trends' },
+    { to: '/notifications', label: 'Notifications' },
+    { to: '/bookmarks', label: 'Bookmarks' },
   ],
   settings: [
     { to: '/alerts-settings', label: 'Alerts & Notifications' },

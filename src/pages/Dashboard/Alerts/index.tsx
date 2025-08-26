@@ -12,6 +12,7 @@ import {
   Button,
   Paper,
   Box,
+  Divider,
 } from '@mui/material';
 
 const ALERT_STATS = [
@@ -66,9 +67,11 @@ export default function Alerts(): React.ReactElement {
           <Grid size={{ xs: 12, sm: 3 }}>
             <Paper sx={{ height: '100%' }}>List</Paper>
           </Grid>
-          <Grid size={{ xs: 12, sm: 9 }} sx={{ flex: 1, minHeight: 0 }}>
+          <Grid size={{ xs: 12, sm: 9 }} sx={{ minHeight: 0 }}>
             <Stack sx={{ height: '100%', minHeight: 0 }}>
-              <Stack sx={{ flex: 8 }}>ScreenShot</Stack>
+              <Stack sx={{ flex: 8, borderBottom: '1px solid', borderColor: 'grey' }}>
+                ScreenShot
+              </Stack>
               <Stack sx={{ flex: 4 }}>Table</Stack>
             </Stack>
           </Grid>
