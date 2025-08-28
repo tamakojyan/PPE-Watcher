@@ -30,7 +30,7 @@ type MainKey = (typeof Main)[number]['key'];
 /** Each group owns these first-level path segments (useful for highlighting) */
 const GROUPS: Record<MainKey, Set<string>> = {
   dashboard: new Set(['overview', 'live', 'alerts']),
-  history: new Set(['violations', 'trends', 'Notifications', 'bookmarks']),
+  history: new Set(['violations', 'trends', 'notifications', 'bookmarks']),
   settings: new Set(['alerts-settings', 'contacts', 'sender', 'security']),
 };
 

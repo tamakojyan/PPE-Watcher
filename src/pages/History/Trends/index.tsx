@@ -11,7 +11,7 @@ import {
   Button,
 } from '@mui/material';
 
-export default function Trends() {
+export default function Trends(): React.ReactElement {
   return (
     <Grid container sx={{ flex: 1, minHeight: 0, bgcolor: 'background.paper' }} direction="column">
       <Grid size={{ xs: 12 }}>

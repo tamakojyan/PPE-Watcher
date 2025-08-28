@@ -26,7 +26,7 @@ import SearchIcon from '@mui/icons-material/Search';
 import InputAdornment from '@mui/material/InputAdornment';
 import IconButton from '@mui/material/IconButton';
 import ClearIcon from '@mui/icons-material/Clear';
-export default function SearchViolations() {
+export default function SearchViolations(): React.ReactElement {
   return (
     <Grid
       container

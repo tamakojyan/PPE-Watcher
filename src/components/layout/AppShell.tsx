@@ -45,7 +45,7 @@ export default function AppShell(): React.ReactElement {
             minHeight: 0,
             display: 'flex',
             flexDirection: 'column',
-            bgcolor: 'pink',
+            bgcolor: theme.palette.grey[100],
           }}
         >
           <Outlet />
