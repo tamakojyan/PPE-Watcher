@@ -13,6 +13,8 @@ import {
   Divider,
   Typography,
   Button,
+  List,
+  ListItem,
 } from '@mui/material';
 
 const PPET: string[] = [
@@ -33,37 +35,70 @@ export default function AlertSettings(): React.ReactElement {
         <CardContent>
           <Grid container sx={{ flex: 1 }} direction="column">
             <Grid size={{ xs: 12 }}>
-              <Typography> PPE Type</Typography>
+              <Typography sx={{ my: 3 }}> PPE Type</Typography>
               <FormGroup
                 row
                 sx={{
                   flexWrap: 'wrap',
                   justifyContent: 'center',
                   '& .MuiFormControlLabel-root': {
-                    width: { xs: '100%', md: '45%' },
+                    flex: { xs: '1 1 100%', md: '1 1 45%' },
+                    maxWidth: { xs: '100%', md: '45%' },
+                    boxSizing: 'border-box',
                     mx: 1,
+                    my: 3,
                   },
                 }}
-              ></FormGroup>
+              >
+                {PPET.map((item) => (
+                  <FormControlLabel key={item} label={item} control={<Checkbox />} />
+                ))}
+              </FormGroup>
             </Grid>
-            <Grid size={{ xs: 12 }}>
-              <Typography> Notifications Type</Typography>
-              <Grid container spacing={1}>
-                <FormGroup>
-                  <Grid container spacing={2} justifyContent={'center'} alignItems={'center'}>
-                    {['EMAIL', 'SMS'].map((p, index) => (
-                      <Grid key={p} size={{ xs: 12, md: 6 }}>
-                        <FormControlLabel label={p} control={<Checkbox />} />
-                      </Grid>
-                    ))}
-                  </Grid>
-                </FormGroup>
-              </Grid>
+            <Grid size={{ xs: 12 }} sx={{ my: 3 }}>
+              <Typography sx={{ my: 3 }}> Notifications Type</Typography>
+              <FormGroup
+                row
+                sx={{
+                  flexWrap: 'wrap',
+                  justifyContent: 'center',
+                  '& .MuiFormControlLabel-root': {
+                    flex: { xs: '1 1 100%', md: '1 1 45%' },
+                    maxWidth: { xs: '100%', md: '45%' },
+                    boxSizing: 'border-box',
+                    mx: 1,
+                    my: 3,
+                  },
+                }}
+              >
+                {['EMAIL', 'SMS'].map((item) => (
+                  <FormControlLabel key={item} label={item} control={<Checkbox />} />
+                ))}
+              </FormGroup>
             </Grid>
-            <Grid size={{ xs: 12 }}>
-              <Grid container justifyContent={'center'} sx={{ mt: 4 }}>
-                <Button>SAVE</Button>
-              </Grid>
+            <Grid size={{ xs: 12 }} sx={{ flex: 1 }}>
+              <Stack direction={'column'} justifyContent={'center'}>
+                <Stack sx={{ my: 4, alignItems: 'center' }}>
+                  <Button variant={'contained'}>SAVE</Button>
+                </Stack>
+                <Stack sx={{ my: 4 }}>
+                  <Typography variant={'body1'} sx={{ width: '100%' }}>
+                    NOTE:
+                  </Typography>
+                  <List dense>
+                    <ListItem>
+                      1.Select at least one PPE type for proper violation detection.
+                    </ListItem>
+                    <ListItem>
+                      2.Select at least one notification method (Email or SMS) to ensure alerts are
+                      delivered.
+                    </ListItem>
+                    <ListItem>
+                      3.Saved settings take effect immediately and apply only to future alerts.
+                    </ListItem>
+                  </List>
+                </Stack>
+              </Stack>
             </Grid>
           </Grid>
         </CardContent>
