@@ -1,6 +1,4 @@
-import * as react from 'react';
 import {
-  Box,
   Typography,
   Stack,
   Button,
@@ -15,6 +13,7 @@ import {
   TableBody,
   TableRow,
   TableCell,
+  IconButton,
 } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import { mockViolations } from 'mock/violations';
@@ -26,6 +25,9 @@ import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
 import RemoveIcon from '@mui/icons-material/Remove';
 import VideocamIcon from '@mui/icons-material/Videocam';
 import EventIcon from '@mui/icons-material/Event';
+import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
+import FavoriteIcon from '@mui/icons-material/Favorite';
+import { pink } from '@mui/material/colors';
 
 export default function Dashboard(): React.ReactElement {
   const navigate = useNavigate();
@@ -184,6 +186,7 @@ export default function Dashboard(): React.ReactElement {
                   <TableCell>Handler</TableCell>
                   <TableCell>Status</TableCell>
                   <TableCell>Detail</TableCell>
+                  <TableCell>Bookmarks</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -220,6 +223,15 @@ export default function Dashboard(): React.ReactElement {
                       <Button sx={{ maxWidth: 100 }} variant={'contained'}>
                         Detail
                       </Button>
+                    </TableCell>
+                    <TableCell>
+                      <IconButton>
+                        <FavoriteBorderIcon
+                          sx={{
+                            color: theme.palette.mode === 'light' ? pink[500] : pink[100],
+                          }}
+                        />
+                      </IconButton>
                     </TableCell>
                   </TableRow>
                 ))}

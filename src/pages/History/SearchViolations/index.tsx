@@ -26,7 +26,37 @@ import SearchIcon from '@mui/icons-material/Search';
 import InputAdornment from '@mui/material/InputAdornment';
 import IconButton from '@mui/material/IconButton';
 import ClearIcon from '@mui/icons-material/Clear';
+import { mockViolations } from '../../../mock/violations';
+import { useState } from 'react';
+import { useTheme } from '@mui/material';
+import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
+import FavoriteIcon from '@mui/icons-material/Favorite';
+import { pink } from '@mui/material/colors';
+
 export default function SearchViolations(): React.ReactElement {
+  type violationData = {
+    id: string;
+    type: string;
+    status: string;
+    handler: null | string;
+    timestamp: string;
+    imageUrl: string;
+  };
+  const theme = useTheme();
+  const [selected, setSelected] = useState<violationData | null>(null);
+  const [page, setPage] = useState(0);
+  const [rowsPerPage, setRowsPerPage] = useState<number>(15);
+  const handleChangePage = (_: unknown, newPage: number) => setPage(newPage);
+  const handleChangeRowsPerPage = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const value = parseInt(event.target.value, 10);
+    setRowsPerPage(value);
+    setPage(0);
+  };
+  const visibleRows = mockViolations.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
+  const handleRowClick = (row: violationData) => {
+    setSelected(row);
+    console.log(row);
+  };
   return (
     <Grid
       container
@@ -94,7 +124,7 @@ export default function SearchViolations(): React.ReactElement {
       </Grid>
       <Grid size={{ xs: 12 }} sx={{ flex: 1, minHeight: 0 }}>
         <Grid container sx={{ height: '100%', minHeight: 0 }} spacing={1}>
-          <Grid size={{ xs: 12, md: 8 }}>
+          <Grid size={{ xs: 12, lg: 8 }}>
             <Card sx={{ height: { xs: 'auto', md: '100%' }, border: '1px solid' }}>
               <CardHeader
                 title={'List'}
@@ -105,12 +135,53 @@ export default function SearchViolations(): React.ReactElement {
                 }}
               />
               <Divider />
-              <CardContent
-                sx={{ height: { xs: 'auto', md: '100%' }, border: '1px solid' }}
-              ></CardContent>
+              <CardContent sx={{ height: { xs: 'auto', md: '100%' }, border: '1px solid' }}>
+                <TableContainer>
+                  <Table stickyHeader>
+                    <TableHead>
+                      <TableRow>
+                        <TableCell>Id</TableCell>
+                        <TableCell>Type</TableCell>
+                        <TableCell>Time</TableCell>
+                        <TableCell>Handler</TableCell>
+                        <TableCell>Status</TableCell>
+                      </TableRow>
+                    </TableHead>
+                    <TableBody>
+                      {visibleRows.map((row) => (
+                        <TableRow
+                          key={row.id}
+                          hover
+                          sx={{
+                            cursor: 'pointer',
+                            bgcolor:
+                              selected?.id === row.id ? theme.palette.action.selected : undefined,
+                          }}
+                          onClick={() => handleRowClick(row)}
+                        >
+                          <TableCell>{row.id}</TableCell>
+                          <TableCell>{row.type}</TableCell>
+                          <TableCell>{row.timestamp}</TableCell>
+                          <TableCell>{row.handler}</TableCell>
+                          <TableCell>{row.status}</TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </TableContainer>
+                <TablePagination
+                  component="div"
+                  count={mockViolations.length}
+                  page={page}
+                  onPageChange={handleChangePage}
+                  rowsPerPage={rowsPerPage}
+                  onRowsPerPageChange={handleChangeRowsPerPage}
+                  rowsPerPageOptions={[15, 30]}
+                />
+              </CardContent>
             </Card>
           </Grid>
-          <Grid size={{ xs: 12, md: 4 }}>
+          <Grid size={{ xs: 12, lg: 4 }}>
             <Card sx={{ height: { xs: 'auto', md: '100%' }, border: '1px solid' }}>
               <CardHeader
                 title={'Details'}
@@ -129,8 +200,92 @@ export default function SearchViolations(): React.ReactElement {
                   flexDirection: 'column',
                 }}
               >
-                <Stack sx={{ flex: 8, border: '1px solid' }}>ScreenShot</Stack>
-                <Stack sx={{ flex: 4 }}>Table</Stack>
+                <Stack
+                  sx={{
+                    flex: 8,
+                    border: '1px solid',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                  }}
+                >
+                  {selected ? (
+                    <img
+                      src={selected?.imageUrl}
+                      alt=""
+                      style={{
+                        minHeight: 0,
+                        maxWidth: '100%',
+                        maxHeight: '750px',
+                        objectFit: 'contain',
+                      }}
+                    />
+                  ) : (
+                    <Typography> Click A row to preview</Typography>
+                  )}
+                </Stack>
+                <Stack sx={{ flex: 4 }}>
+                  {selected ? (
+                    <TableContainer sx={{ minHeight: '100px' }}>
+                      <Table stickyHeader>
+                        <TableHead>
+                          <TableRow>
+                            <TableCell>Id</TableCell>
+                            <TableCell>Type</TableCell>
+                            <TableCell>Time</TableCell>
+                            <TableCell>Status</TableCell>
+                            <TableCell>Handler</TableCell>
+                            <TableCell>Action</TableCell>
+                          </TableRow>
+                        </TableHead>
+                        <TableBody>
+                          <TableRow>
+                            <TableCell>{selected?.id}</TableCell>
+                            <TableCell>{selected?.type}</TableCell>
+                            <TableCell>{selected?.timestamp}</TableCell>
+                            <TableCell>{selected?.status}</TableCell>
+                            <TableCell>{selected?.handler}</TableCell>
+                            <TableCell>
+                              {selected?.status === 'open' ? (
+                                <Button
+                                  variant={'contained'}
+                                  sx={{
+                                    maxWidth: 100,
+                                    bgcolor:
+                                      theme.palette.mode === 'light'
+                                        ? theme.palette.error.main
+                                        : '#5f0e06',
+                                  }}
+                                >
+                                  Resolve
+                                </Button>
+                              ) : (
+                                <Button
+                                  variant={'contained'}
+                                  disabled
+                                  sx={{ maxWidth: 100 }}
+                                  color={'success'}
+                                >
+                                  Resolved
+                                </Button>
+                              )}
+                            </TableCell>
+                            <TableCell>
+                              <IconButton>
+                                <FavoriteBorderIcon
+                                  sx={{
+                                    color: theme.palette.mode === 'light' ? pink[500] : pink[100],
+                                  }}
+                                />
+                              </IconButton>
+                            </TableCell>
+                          </TableRow>
+                        </TableBody>
+                      </Table>
+                    </TableContainer>
+                  ) : (
+                    <Typography> Click A row to preview</Typography>
+                  )}
+                </Stack>
               </CardContent>
             </Card>
           </Grid>

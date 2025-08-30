@@ -17,6 +17,7 @@ import {
   Card,
   CardContent,
   TablePagination,
+  IconButton,
 } from '@mui/material';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import ErrorIcon from '@mui/icons-material/Error';
@@ -24,6 +25,9 @@ import ListAltIcon from '@mui/icons-material/ListAlt';
 import { mockViolations } from '../../../mock/violations';
 import { useState } from 'react';
 import { useTheme } from '@mui/material';
+import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
+import FavoriteIcon from '@mui/icons-material/Favorite';
+import { pink } from '@mui/material/colors';
 
 export default function Alerts(): React.ReactElement {
   const theme = useTheme();
@@ -36,7 +40,7 @@ export default function Alerts(): React.ReactElement {
     { label: 'Total', value: totalCount, icon: <ListAltIcon color="primary" /> },
   ];
   type violationData = {
-    id: number;
+    id: string;
     type: string;
     status: string;
     handler: null | string;
@@ -129,7 +133,7 @@ export default function Alerts(): React.ReactElement {
                 count={mockViolations.filter((i) => i.status === 'open').length}
                 page={page}
                 onPageChange={handleChangePage}
-                rowsPerPage={10}
+                rowsPerPage={rowsPerPage}
                 onRowsPerPageChange={handleChangeRowsPerPage}
                 rowsPerPageOptions={[15, 30]}
               />
@@ -182,7 +186,7 @@ export default function Alerts(): React.ReactElement {
                           <TableCell>{selected?.timestamp}</TableCell>
                           <TableCell>{selected?.status}</TableCell>
                           <TableCell>{selected?.handler}</TableCell>
-                          <TableCell align={'center'}>
+                          <TableCell>
                             {selected?.status === 'open' ? (
                               <Button
                                 variant={'contained'}
@@ -206,6 +210,15 @@ export default function Alerts(): React.ReactElement {
                                 Resolved
                               </Button>
                             )}
+                          </TableCell>
+                          <TableCell>
+                            <IconButton>
+                              <FavoriteBorderIcon
+                                sx={{
+                                  color: theme.palette.mode === 'light' ? pink[500] : pink[100],
+                                }}
+                              />
+                            </IconButton>
                           </TableCell>
                         </TableRow>
                       </TableBody>
