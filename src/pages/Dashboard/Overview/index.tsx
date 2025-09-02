@@ -181,7 +181,7 @@ export default function Dashboard(): React.ReactElement {
               <TableHead>
                 <TableRow>
                   <TableCell>Id</TableCell>
-                  <TableCell>Type</TableCell>
+                  <TableCell width={'500px'}>Type</TableCell>
                   <TableCell>Time</TableCell>
                   <TableCell>Handler</TableCell>
                   <TableCell>Status</TableCell>
@@ -193,7 +193,7 @@ export default function Dashboard(): React.ReactElement {
                 {mockViolations.slice(0, 10).map((item) => (
                   <TableRow key={item.id}>
                     <TableCell>{item.id}</TableCell>
-                    <TableCell>{item.type}</TableCell>
+                    <TableCell>{item.type.join(',')}</TableCell>
                     <TableCell>{item.timestamp}</TableCell>
                     <TableCell>{item.handler}</TableCell>
                     <TableCell>

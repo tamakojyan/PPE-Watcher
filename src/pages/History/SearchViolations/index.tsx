@@ -36,7 +36,7 @@ import { pink } from '@mui/material/colors';
 export default function SearchViolations(): React.ReactElement {
   type violationData = {
     id: string;
-    type: string;
+    type: string[];
     status: string;
     handler: null | string;
     timestamp: string;
@@ -141,7 +141,7 @@ export default function SearchViolations(): React.ReactElement {
                     <TableHead>
                       <TableRow>
                         <TableCell>Id</TableCell>
-                        <TableCell>Type</TableCell>
+                        <TableCell width={'500px'}>Type</TableCell>
                         <TableCell>Time</TableCell>
                         <TableCell>Handler</TableCell>
                         <TableCell>Status</TableCell>
@@ -160,7 +160,7 @@ export default function SearchViolations(): React.ReactElement {
                           onClick={() => handleRowClick(row)}
                         >
                           <TableCell>{row.id}</TableCell>
-                          <TableCell>{row.type}</TableCell>
+                          <TableCell>{row.type.join(',')}</TableCell>
                           <TableCell>{row.timestamp}</TableCell>
                           <TableCell>{row.handler}</TableCell>
                           <TableCell>{row.status}</TableCell>
@@ -230,7 +230,7 @@ export default function SearchViolations(): React.ReactElement {
                         <TableHead>
                           <TableRow>
                             <TableCell>Id</TableCell>
-                            <TableCell>Type</TableCell>
+                            <TableCell width={'500px'}>Type</TableCell>
                             <TableCell>Time</TableCell>
                             <TableCell>Status</TableCell>
                             <TableCell>Handler</TableCell>
@@ -240,7 +240,8 @@ export default function SearchViolations(): React.ReactElement {
                         <TableBody>
                           <TableRow>
                             <TableCell>{selected?.id}</TableCell>
-                            <TableCell>{selected?.type}</TableCell>
+                            <TableCell>{selected?.type.join(',')}</TableCell>
+
                             <TableCell>{selected?.timestamp}</TableCell>
                             <TableCell>{selected?.status}</TableCell>
                             <TableCell>{selected?.handler}</TableCell>

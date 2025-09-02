@@ -41,7 +41,7 @@ export default function Alerts(): React.ReactElement {
   ];
   type violationData = {
     id: string;
-    type: string;
+    type: string[];
     status: string;
     handler: null | string;
     timestamp: string;
@@ -97,7 +97,7 @@ export default function Alerts(): React.ReactElement {
 
       <Grid size={{ xs: 12 }} sx={{ display: 'flex', flex: 1, minHeight: 0 }}>
         <Grid container sx={{ flex: 1, minHeight: 0 }}>
-          <Grid size={{ xs: 12, lg: 3 }} sx={{ minHeight: 0 }}>
+          <Grid size={{ xs: 12, lg: 5 }} sx={{ minHeight: 0 }}>
             <Paper>
               <TableContainer>
                 <Table stickyHeader>
@@ -121,7 +121,7 @@ export default function Alerts(): React.ReactElement {
                         onClick={() => handleRowClick(row)}
                       >
                         <TableCell>{row.id}</TableCell>
-                        <TableCell>{row.type}</TableCell>
+                        <TableCell>{row.type.join(',')}</TableCell>
                         <TableCell>{row.timestamp}</TableCell>
                       </TableRow>
                     ))}
@@ -139,7 +139,7 @@ export default function Alerts(): React.ReactElement {
               />
             </Paper>
           </Grid>
-          <Grid size={{ xs: 12, lg: 9 }} sx={{ minHeight: 0 }}>
+          <Grid size={{ xs: 12, lg: 7 }} sx={{ minHeight: 0 }}>
             <Stack sx={{ height: '100%', minHeight: 0, display: 'flex' }}>
               <Stack
                 sx={{
@@ -172,7 +172,7 @@ export default function Alerts(): React.ReactElement {
                       <TableHead>
                         <TableRow>
                           <TableCell>Id</TableCell>
-                          <TableCell>Type</TableCell>
+                          <TableCell width={'500px'}>Type</TableCell>
                           <TableCell>Time</TableCell>
                           <TableCell>Status</TableCell>
                           <TableCell>Handler</TableCell>
@@ -182,7 +182,7 @@ export default function Alerts(): React.ReactElement {
                       <TableBody>
                         <TableRow>
                           <TableCell>{selected?.id}</TableCell>
-                          <TableCell>{selected?.type}</TableCell>
+                          <TableCell>{selected?.type.join(',')}</TableCell>
                           <TableCell>{selected?.timestamp}</TableCell>
                           <TableCell>{selected?.status}</TableCell>
                           <TableCell>{selected?.handler}</TableCell>

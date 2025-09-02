@@ -4,7 +4,7 @@ import shibaInuResized from './images/shiba-inu_resized.png';
 export const mockViolations = [
   {
     id: 'vio1',
-    type: 'No Helmet',
+    type: ['No Helmet', 'No Mask', 'No Mask', 'No Mask', 'No Gloves'],
     status: 'open',
     handler: null,
     timestamp: '2025-08-25T09:15:00Z',
@@ -12,7 +12,7 @@ export const mockViolations = [
   },
   {
     id: 'vio2',
-    type: 'No Mask',
+    type: ['No Mask'],
     status: 'resolved',
     handler: 'Charlie',
     timestamp: '2025-08-25T09:51:00Z',
@@ -20,7 +20,7 @@ export const mockViolations = [
   },
   {
     id: 'vio3',
-    type: 'No Vest',
+    type: ['No Vest'],
     status: 'resolved',
     handler: 'David',
     timestamp: '2025-08-25T11:51:00Z',
@@ -28,7 +28,7 @@ export const mockViolations = [
   },
   {
     id: 'vio4',
-    type: 'Gloves Missing',
+    type: ['No Gloves'],
     status: 'open',
     handler: null,
     timestamp: '2025-08-25T12:30:00Z',
@@ -36,7 +36,7 @@ export const mockViolations = [
   },
   {
     id: 'vio5',
-    type: 'No Helmet',
+    type: ['No Helmet'],
     status: 'resolved',
     handler: 'Bob',
     timestamp: '2025-08-25T13:43:00Z',
@@ -44,7 +44,7 @@ export const mockViolations = [
   },
   {
     id: 'vio6',
-    type: 'No Mask',
+    type: ['No Mask'],
     status: 'open',
     handler: null,
     timestamp: '2025-08-25T15:35:00Z',
@@ -52,7 +52,7 @@ export const mockViolations = [
   },
   {
     id: 'vio7',
-    type: 'No Vest',
+    type: ['No Vest'],
     status: 'open',
     handler: null,
     timestamp: '2025-08-25T14:09:00Z',
@@ -60,7 +60,7 @@ export const mockViolations = [
   },
   {
     id: 'vio8',
-    type: 'Gloves Missing',
+    type: ['No Gloves'],
     status: 'open',
     handler: null,
     timestamp: '2025-08-25T13:34:00Z',
@@ -68,7 +68,7 @@ export const mockViolations = [
   },
   {
     id: 'vio9',
-    type: 'No Helmet',
+    type: ['No Helmet'],
     status: 'resolved',
     handler: 'Bob',
     timestamp: '2025-08-25T15:55:00Z',
@@ -76,7 +76,7 @@ export const mockViolations = [
   },
   {
     id: 'vio10',
-    type: 'No Mask',
+    type: ['No Mask'],
     status: 'resolved',
     handler: 'Eve',
     timestamp: '2025-08-25T18:24:00Z',
@@ -84,7 +84,7 @@ export const mockViolations = [
   },
   {
     id: 'vio11',
-    type: 'No Vest',
+    type: ['No Vest'],
     status: 'resolved',
     handler: 'Alice',
     timestamp: '2025-08-25T18:05:00Z',
@@ -92,7 +92,7 @@ export const mockViolations = [
   },
   {
     id: 'vio12',
-    type: 'Gloves Missing',
+    type: ['No Gloves'],
     status: 'resolved',
     handler: 'Alice',
     timestamp: '2025-08-25T23:33:00Z',
@@ -100,7 +100,7 @@ export const mockViolations = [
   },
   {
     id: 'vio13',
-    type: 'No Helmet',
+    type: ['No Helmet'],
     status: 'open',
     handler: null,
     timestamp: '2025-08-25T16:51:00Z',
@@ -108,7 +108,7 @@ export const mockViolations = [
   },
   {
     id: 'vio14',
-    type: 'No Mask',
+    type: ['No Mask'],
     status: 'resolved',
     handler: 'Alice',
     timestamp: '2025-08-25T23:33:00Z',
@@ -116,7 +116,7 @@ export const mockViolations = [
   },
   {
     id: 'vio15',
-    type: 'No Vest',
+    type: ['No Vest'],
     status: 'open',
     handler: null,
     timestamp: '2025-08-26T00:39:00Z',
@@ -124,7 +124,7 @@ export const mockViolations = [
   },
   {
     id: 'vio16',
-    type: 'Gloves Missing',
+    type: ['No Gloves'],
     status: 'open',
     handler: null,
     timestamp: '2025-08-26T06:45:00Z',
@@ -132,7 +132,7 @@ export const mockViolations = [
   },
   {
     id: 'vio17',
-    type: 'No Helmet',
+    type: ['No Helmet'],
     status: 'resolved',
     handler: 'Alice',
     timestamp: '2025-08-26T00:11:00Z',
@@ -140,7 +140,7 @@ export const mockViolations = [
   },
   {
     id: 'vio18',
-    type: 'No Mask',
+    type: ['No Mask'],
     status: 'resolved',
     handler: 'David',
     timestamp: '2025-08-26T02:32:00Z',
@@ -148,7 +148,7 @@ export const mockViolations = [
   },
   {
     id: 'vio19',
-    type: 'No Vest',
+    type: ['No Vest'],
     status: 'open',
     handler: null,
     timestamp: '2025-08-26T05:39:00Z',
@@ -156,7 +156,7 @@ export const mockViolations = [
   },
   {
     id: 'vio20',
-    type: 'Gloves Missing',
+    type: ['No Gloves'],
     status: 'open',
     handler: null,
     timestamp: '2025-08-26T05:50:00Z',
@@ -164,7 +164,7 @@ export const mockViolations = [
   },
   {
     id: 'vio21',
-    type: 'No Helmet',
+    type: ['No Helmet'],
     status: 'open',
     handler: null,
     timestamp: '2025-08-26T02:35:00Z',
@@ -172,7 +172,7 @@ export const mockViolations = [
   },
   {
     id: 'vio22',
-    type: 'No Mask',
+    type: ['No Mask'],
     status: 'resolved',
     handler: 'Alice',
     timestamp: '2025-08-26T05:54:00Z',
@@ -180,7 +180,7 @@ export const mockViolations = [
   },
   {
     id: 'vio23',
-    type: 'No Vest',
+    type: ['No Vest'],
     status: 'resolved',
     handler: 'David',
     timestamp: '2025-08-26T09:49:00Z',
@@ -188,7 +188,7 @@ export const mockViolations = [
   },
   {
     id: 'vio24',
-    type: 'Gloves Missing',
+    type: ['No Gloves'],
     status: 'open',
     handler: null,
     timestamp: '2025-08-26T00:12:00Z',
@@ -196,7 +196,7 @@ export const mockViolations = [
   },
   {
     id: 'vio25',
-    type: 'No Helmet',
+    type: ['No Helmet'],
     status: 'resolved',
     handler: 'Eve',
     timestamp: '2025-08-26T06:03:00Z',
@@ -204,7 +204,7 @@ export const mockViolations = [
   },
   {
     id: 'vio26',
-    type: 'No Mask',
+    type: ['No Mask'],
     status: 'resolved',
     handler: 'Charlie',
     timestamp: '2025-08-26T05:40:00Z',
@@ -212,7 +212,7 @@ export const mockViolations = [
   },
   {
     id: 'vio27',
-    type: 'No Vest',
+    type: ['No Vest'],
     status: 'resolved',
     handler: 'Alice',
     timestamp: '2025-08-26T01:43:00Z',
@@ -220,7 +220,7 @@ export const mockViolations = [
   },
   {
     id: 'vio28',
-    type: 'Gloves Missing',
+    type: ['No Gloves'],
     status: 'resolved',
     handler: 'Charlie',
     timestamp: '2025-08-26T14:57:00Z',
@@ -228,7 +228,7 @@ export const mockViolations = [
   },
   {
     id: 'vio29',
-    type: 'No Helmet',
+    type: ['No Helmet'],
     status: 'open',
     handler: null,
     timestamp: '2025-08-26T09:03:00Z',
@@ -236,7 +236,7 @@ export const mockViolations = [
   },
   {
     id: 'vio30',
-    type: 'No Mask',
+    type: ['No Mask'],
     status: 'open',
     handler: null,
     timestamp: '2025-08-26T07:00:00Z',
@@ -244,7 +244,7 @@ export const mockViolations = [
   },
   {
     id: 'vio31',
-    type: 'No Vest',
+    type: ['No Vest'],
     status: 'resolved',
     handler: 'Alice',
     timestamp: '2025-08-26T23:15:00Z',
@@ -252,7 +252,7 @@ export const mockViolations = [
   },
   {
     id: 'vio32',
-    type: 'Gloves Missing',
+    type: ['No Gloves'],
     status: 'resolved',
     handler: 'Charlie',
     timestamp: '2025-08-27T03:06:00Z',
@@ -260,7 +260,7 @@ export const mockViolations = [
   },
   {
     id: 'vio33',
-    type: 'No Helmet',
+    type: ['No Helmet'],
     status: 'resolved',
     handler: 'Eve',
     timestamp: '2025-08-26T09:15:00Z',
@@ -268,7 +268,7 @@ export const mockViolations = [
   },
   {
     id: 'vio34',
-    type: 'No Mask',
+    type: ['No Mask'],
     status: 'open',
     handler: null,
     timestamp: '2025-08-26T23:12:00Z',
@@ -276,7 +276,7 @@ export const mockViolations = [
   },
   {
     id: 'vio35',
-    type: 'No Vest',
+    type: ['No Vest'],
     status: 'open',
     handler: null,
     timestamp: '2025-08-27T01:29:00Z',
@@ -284,7 +284,7 @@ export const mockViolations = [
   },
   {
     id: 'vio36',
-    type: 'Gloves Missing',
+    type: ['No Gloves'],
     status: 'resolved',
     handler: 'Bob',
     timestamp: '2025-08-26T14:25:00Z',
@@ -292,7 +292,7 @@ export const mockViolations = [
   },
   {
     id: 'vio37',
-    type: 'No Helmet',
+    type: ['No Helmet'],
     status: 'open',
     handler: null,
     timestamp: '2025-08-27T05:03:00Z',
@@ -300,7 +300,7 @@ export const mockViolations = [
   },
   {
     id: 'vio38',
-    type: 'No Mask',
+    type: ['No Mask'],
     status: 'resolved',
     handler: 'David',
     timestamp: '2025-08-27T04:25:00Z',
@@ -308,7 +308,7 @@ export const mockViolations = [
   },
   {
     id: 'vio39',
-    type: 'No Vest',
+    type: ['No Vest'],
     status: 'resolved',
     handler: 'Alice',
     timestamp: '2025-08-27T11:55:00Z',
@@ -316,7 +316,7 @@ export const mockViolations = [
   },
   {
     id: 'vio40',
-    type: 'Gloves Missing',
+    type: ['No Gloves'],
     status: 'open',
     handler: null,
     timestamp: '2025-08-27T18:27:00Z',
@@ -324,7 +324,7 @@ export const mockViolations = [
   },
   {
     id: 'vio41',
-    type: 'No Helmet',
+    type: ['No Helmet'],
     status: 'open',
     handler: null,
     timestamp: '2025-08-26T07:55:00Z',
@@ -332,7 +332,7 @@ export const mockViolations = [
   },
   {
     id: 'vio42',
-    type: 'No Mask',
+    type: ['No Mask'],
     status: 'open',
     handler: null,
     timestamp: '2025-08-27T02:15:00Z',
@@ -340,7 +340,7 @@ export const mockViolations = [
   },
   {
     id: 'vio43',
-    type: 'No Vest',
+    type: ['No Vest'],
     status: 'resolved',
     handler: 'Charlie',
     timestamp: '2025-08-27T15:51:00Z',
@@ -348,7 +348,7 @@ export const mockViolations = [
   },
   {
     id: 'vio44',
-    type: 'Gloves Missing',
+    type: ['No Gloves'],
     status: 'resolved',
     handler: 'Alice',
     timestamp: '2025-08-27T18:35:00Z',
@@ -356,7 +356,7 @@ export const mockViolations = [
   },
   {
     id: 'vio45',
-    type: 'No Helmet',
+    type: ['No Helmet'],
     status: 'open',
     handler: null,
     timestamp: '2025-08-27T16:59:00Z',
@@ -364,7 +364,7 @@ export const mockViolations = [
   },
   {
     id: 'vio46',
-    type: 'No Mask',
+    type: ['No Mask'],
     status: 'resolved',
     handler: 'David',
     timestamp: '2025-08-28T04:00:00Z',
@@ -372,7 +372,7 @@ export const mockViolations = [
   },
   {
     id: 'vio47',
-    type: 'No Vest',
+    type: ['No Vest'],
     status: 'resolved',
     handler: 'Eve',
     timestamp: '2025-08-28T00:53:00Z',
@@ -380,7 +380,7 @@ export const mockViolations = [
   },
   {
     id: 'vio48',
-    type: 'Gloves Missing',
+    type: ['No Gloves'],
     status: 'open',
     handler: null,
     timestamp: '2025-08-26T11:53:00Z',
@@ -388,7 +388,7 @@ export const mockViolations = [
   },
   {
     id: 'vio49',
-    type: 'No Helmet',
+    type: ['No Helmet'],
     status: 'open',
     handler: null,
     timestamp: '2025-08-27T22:03:00Z',
@@ -396,7 +396,7 @@ export const mockViolations = [
   },
   {
     id: 'vio50',
-    type: 'No Mask',
+    type: ['No Mask'],
     status: 'resolved',
     handler: 'Eve',
     timestamp: '2025-08-27T14:20:00Z',
@@ -404,7 +404,7 @@ export const mockViolations = [
   },
   {
     id: 'vio51',
-    type: 'No Vest',
+    type: ['No Vest'],
     status: 'open',
     handler: null,
     timestamp: '2025-08-28T08:05:00Z',
@@ -412,7 +412,7 @@ export const mockViolations = [
   },
   {
     id: 'vio52',
-    type: 'Gloves Missing',
+    type: ['No Gloves'],
     status: 'resolved',
     handler: 'Bob',
     timestamp: '2025-08-28T02:42:00Z',
@@ -420,7 +420,7 @@ export const mockViolations = [
   },
   {
     id: 'vio53',
-    type: 'No Helmet',
+    type: ['No Helmet'],
     status: 'open',
     handler: null,
     timestamp: '2025-08-28T12:39:00Z',
@@ -428,7 +428,7 @@ export const mockViolations = [
   },
   {
     id: 'vio54',
-    type: 'No Mask',
+    type: ['No Mask'],
     status: 'open',
     handler: null,
     timestamp: '2025-08-26T19:42:00Z',
@@ -436,7 +436,7 @@ export const mockViolations = [
   },
   {
     id: 'vio55',
-    type: 'No Vest',
+    type: ['No Vest'],
     status: 'resolved',
     handler: 'Alice',
     timestamp: '2025-08-26T20:21:00Z',
@@ -444,7 +444,7 @@ export const mockViolations = [
   },
   {
     id: 'vio56',
-    type: 'Gloves Missing',
+    type: ['No Gloves'],
     status: 'open',
     handler: null,
     timestamp: '2025-08-27T21:45:00Z',
@@ -452,7 +452,7 @@ export const mockViolations = [
   },
   {
     id: 'vio57',
-    type: 'No Helmet',
+    type: ['No Helmet'],
     status: 'resolved',
     handler: 'Alice',
     timestamp: '2025-08-27T22:51:00Z',
@@ -460,7 +460,7 @@ export const mockViolations = [
   },
   {
     id: 'vio58',
-    type: 'No Mask',
+    type: ['No Mask'],
     status: 'resolved',
     handler: 'Alice',
     timestamp: '2025-08-28T09:27:00Z',
@@ -468,7 +468,7 @@ export const mockViolations = [
   },
   {
     id: 'vio59',
-    type: 'No Vest',
+    type: ['No Vest'],
     status: 'resolved',
     handler: 'David',
     timestamp: '2025-08-26T20:03:00Z',
@@ -476,7 +476,7 @@ export const mockViolations = [
   },
   {
     id: 'vio60',
-    type: 'Gloves Missing',
+    type: ['No Gloves'],
     status: 'open',
     handler: null,
     timestamp: '2025-08-29T00:46:00Z',
@@ -484,7 +484,7 @@ export const mockViolations = [
   },
   {
     id: 'vio61',
-    type: 'No Helmet',
+    type: ['No Helmet'],
     status: 'open',
     handler: null,
     timestamp: '2025-08-28T12:15:00Z',
@@ -492,7 +492,7 @@ export const mockViolations = [
   },
   {
     id: 'vio62',
-    type: 'No Mask',
+    type: ['No Mask'],
     status: 'resolved',
     handler: 'Eve',
     timestamp: '2025-08-29T00:41:00Z',
@@ -500,7 +500,7 @@ export const mockViolations = [
   },
   {
     id: 'vio63',
-    type: 'No Vest',
+    type: ['No Vest'],
     status: 'open',
     handler: null,
     timestamp: '2025-08-28T02:21:00Z',
@@ -508,7 +508,7 @@ export const mockViolations = [
   },
   {
     id: 'vio64',
-    type: 'Gloves Missing',
+    type: ['No Gloves'],
     status: 'open',
     handler: null,
     timestamp: '2025-08-27T11:39:00Z',
@@ -516,7 +516,7 @@ export const mockViolations = [
   },
   {
     id: 'vio65',
-    type: 'No Helmet',
+    type: ['No Helmet'],
     status: 'resolved',
     handler: 'David',
     timestamp: '2025-08-28T07:39:00Z',
@@ -524,7 +524,7 @@ export const mockViolations = [
   },
   {
     id: 'vio66',
-    type: 'No Mask',
+    type: ['No Mask'],
     status: 'resolved',
     handler: 'David',
     timestamp: '2025-08-27T21:55:00Z',
@@ -532,7 +532,7 @@ export const mockViolations = [
   },
   {
     id: 'vio67',
-    type: 'No Vest',
+    type: ['No Vest'],
     status: 'resolved',
     handler: 'Alice',
     timestamp: '2025-08-29T01:15:00Z',
@@ -540,7 +540,7 @@ export const mockViolations = [
   },
   {
     id: 'vio68',
-    type: 'Gloves Missing',
+    type: ['No Gloves'],
     status: 'resolved',
     handler: 'David',
     timestamp: '2025-08-28T08:43:00Z',
@@ -548,7 +548,7 @@ export const mockViolations = [
   },
   {
     id: 'vio69',
-    type: 'No Helmet',
+    type: ['No Helmet'],
     status: 'open',
     handler: null,
     timestamp: '2025-08-28T17:43:00Z',
@@ -556,7 +556,7 @@ export const mockViolations = [
   },
   {
     id: 'vio70',
-    type: 'No Mask',
+    type: ['No Mask'],
     status: 'resolved',
     handler: 'Bob',
     timestamp: '2025-08-29T02:57:00Z',
@@ -564,7 +564,7 @@ export const mockViolations = [
   },
   {
     id: 'vio71',
-    type: 'No Vest',
+    type: ['No Vest'],
     status: 'resolved',
     handler: 'Bob',
     timestamp: '2025-08-27T18:25:00Z',
@@ -572,7 +572,7 @@ export const mockViolations = [
   },
   {
     id: 'vio72',
-    type: 'Gloves Missing',
+    type: ['No Gloves'],
     status: 'resolved',
     handler: 'David',
     timestamp: '2025-08-28T22:27:00Z',
@@ -580,7 +580,7 @@ export const mockViolations = [
   },
   {
     id: 'vio73',
-    type: 'No Helmet',
+    type: ['No Helmet'],
     status: 'open',
     handler: null,
     timestamp: '2025-08-29T20:03:00Z',
@@ -588,7 +588,7 @@ export const mockViolations = [
   },
   {
     id: 'vio74',
-    type: 'No Mask',
+    type: ['No Mask'],
     status: 'open',
     handler: null,
     timestamp: '2025-08-28T18:46:00Z',
@@ -596,7 +596,7 @@ export const mockViolations = [
   },
   {
     id: 'vio75',
-    type: 'No Vest',
+    type: ['No Vest'],
     status: 'resolved',
     handler: 'Bob',
     timestamp: '2025-08-29T09:27:00Z',
@@ -604,7 +604,7 @@ export const mockViolations = [
   },
   {
     id: 'vio76',
-    type: 'Gloves Missing',
+    type: ['No Gloves'],
     status: 'resolved',
     handler: 'Charlie',
     timestamp: '2025-08-28T17:15:00Z',
@@ -612,7 +612,7 @@ export const mockViolations = [
   },
   {
     id: 'vio77',
-    type: 'No Helmet',
+    type: ['No Helmet'],
     status: 'resolved',
     handler: 'Alice',
     timestamp: '2025-08-27T05:35:00Z',
@@ -620,7 +620,7 @@ export const mockViolations = [
   },
   {
     id: 'vio78',
-    type: 'No Mask',
+    type: ['No Mask'],
     status: 'resolved',
     handler: 'David',
     timestamp: '2025-08-27T02:19:00Z',
@@ -628,7 +628,7 @@ export const mockViolations = [
   },
   {
     id: 'vio79',
-    type: 'No Vest',
+    type: ['No Vest'],
     status: 'resolved',
     handler: 'Bob',
     timestamp: '2025-08-28T20:27:00Z',
@@ -636,7 +636,7 @@ export const mockViolations = [
   },
   {
     id: 'vio80',
-    type: 'Gloves Missing',
+    type: ['No Gloves'],
     status: 'open',
     handler: null,
     timestamp: '2025-08-27T04:42:00Z',
@@ -644,7 +644,7 @@ export const mockViolations = [
   },
   {
     id: 'vio81',
-    type: 'No Helmet',
+    type: ['No Helmet'],
     status: 'resolved',
     handler: 'Bob',
     timestamp: '2025-08-29T15:55:00Z',
@@ -652,7 +652,7 @@ export const mockViolations = [
   },
   {
     id: 'vio82',
-    type: 'No Mask',
+    type: ['No Mask'],
     status: 'resolved',
     handler: 'Charlie',
     timestamp: '2025-08-29T09:06:00Z',
@@ -660,7 +660,7 @@ export const mockViolations = [
   },
   {
     id: 'vio83',
-    type: 'No Vest',
+    type: ['No Vest'],
     status: 'open',
     handler: null,
     timestamp: '2025-08-28T17:53:00Z',
@@ -668,7 +668,7 @@ export const mockViolations = [
   },
   {
     id: 'vio84',
-    type: 'Gloves Missing',
+    type: ['No Gloves'],
     status: 'open',
     handler: null,
     timestamp: '2025-08-28T21:38:00Z',
@@ -676,7 +676,7 @@ export const mockViolations = [
   },
   {
     id: 'vio85',
-    type: 'No Helmet',
+    type: ['No Helmet'],
     status: 'resolved',
     handler: 'Charlie',
     timestamp: '2025-08-28T10:03:00Z',
@@ -684,7 +684,7 @@ export const mockViolations = [
   },
   {
     id: 'vio86',
-    type: 'No Mask',
+    type: ['No Mask'],
     status: 'open',
     handler: null,
     timestamp: '2025-08-29T05:20:00Z',
@@ -692,7 +692,7 @@ export const mockViolations = [
   },
   {
     id: 'vio87',
-    type: 'No Vest',
+    type: ['No Vest'],
     status: 'open',
     handler: null,
     timestamp: '2025-08-27T09:59:00Z',
@@ -700,7 +700,7 @@ export const mockViolations = [
   },
   {
     id: 'vio88',
-    type: 'Gloves Missing',
+    type: ['No Gloves'],
     status: 'open',
     handler: null,
     timestamp: '2025-08-30T08:09:00Z',
@@ -708,7 +708,7 @@ export const mockViolations = [
   },
   {
     id: 'vio89',
-    type: 'No Helmet',
+    type: ['No Helmet'],
     status: 'resolved',
     handler: 'Alice',
     timestamp: '2025-08-29T14:27:00Z',
@@ -716,7 +716,7 @@ export const mockViolations = [
   },
   {
     id: 'vio90',
-    type: 'No Mask',
+    type: ['No Mask'],
     status: 'open',
     handler: null,
     timestamp: '2025-08-27T17:37:00Z',
@@ -724,7 +724,7 @@ export const mockViolations = [
   },
   {
     id: 'vio91',
-    type: 'No Vest',
+    type: ['No Vest'],
     status: 'open',
     handler: null,
     timestamp: '2025-08-28T00:15:00Z',
@@ -732,7 +732,7 @@ export const mockViolations = [
   },
   {
     id: 'vio92',
-    type: 'Gloves Missing',
+    type: ['No Gloves'],
     status: 'open',
     handler: null,
     timestamp: '2025-08-27T08:16:00Z',
@@ -740,7 +740,7 @@ export const mockViolations = [
   },
   {
     id: 'vio93',
-    type: 'No Helmet',
+    type: ['No Helmet'],
     status: 'resolved',
     handler: 'Alice',
     timestamp: '2025-08-29T03:43:00Z',
@@ -748,7 +748,7 @@ export const mockViolations = [
   },
   {
     id: 'vio94',
-    type: 'No Mask',
+    type: ['No Mask'],
     status: 'resolved',
     handler: 'Bob',
     timestamp: '2025-08-27T23:15:00Z',
@@ -756,7 +756,7 @@ export const mockViolations = [
   },
   {
     id: 'vio95',
-    type: 'No Vest',
+    type: ['No Vest'],
     status: 'resolved',
     handler: 'Bob',
     timestamp: '2025-08-28T14:01:00Z',
@@ -764,7 +764,7 @@ export const mockViolations = [
   },
   {
     id: 'vio96',
-    type: 'Gloves Missing',
+    type: ['No Gloves'],
     status: 'open',
     handler: null,
     timestamp: '2025-08-30T22:15:00Z',
@@ -772,7 +772,7 @@ export const mockViolations = [
   },
   {
     id: 'vio97',
-    type: 'No Helmet',
+    type: ['No Helmet'],
     status: 'resolved',
     handler: 'Alice',
     timestamp: '2025-08-28T14:03:00Z',
@@ -780,7 +780,7 @@ export const mockViolations = [
   },
   {
     id: 'vio98',
-    type: 'No Mask',
+    type: ['No Mask'],
     status: 'open',
     handler: null,
     timestamp: '2025-08-28T22:56:00Z',
@@ -788,7 +788,7 @@ export const mockViolations = [
   },
   {
     id: 'vio99',
-    type: 'No Vest',
+    type: ['No Vest'],
     status: 'open',
     handler: null,
     timestamp: '2025-08-28T07:29:00Z',
@@ -796,7 +796,7 @@ export const mockViolations = [
   },
   {
     id: 'vio100',
-    type: 'Gloves Missing',
+    type: ['No Gloves'],
     status: 'open',
     handler: null,
     timestamp: '2025-08-30T14:39:00Z',
@@ -804,7 +804,7 @@ export const mockViolations = [
   },
   {
     id: 'vio101',
-    type: 'No Helmet',
+    type: ['No Helmet'],
     status: 'resolved',
     handler: 'Alice',
     timestamp: '2025-08-31T09:00:00Z',
@@ -812,7 +812,7 @@ export const mockViolations = [
   },
   {
     id: 'vio102',
-    type: 'No Mask',
+    type: ['No Mask'],
     status: 'open',
     handler: null,
     timestamp: '2025-08-31T09:05:00Z',
@@ -820,7 +820,7 @@ export const mockViolations = [
   },
   {
     id: 'vio103',
-    type: 'No Vest',
+    type: ['No Vest'],
     status: 'resolved',
     handler: 'David',
     timestamp: '2025-08-31T09:10:00Z',
@@ -828,7 +828,7 @@ export const mockViolations = [
   },
   {
     id: 'vio104',
-    type: 'Gloves Missing',
+    type: ['No Gloves'],
     status: 'open',
     handler: null,
     timestamp: '2025-08-31T09:15:00Z',
@@ -836,7 +836,7 @@ export const mockViolations = [
   },
   {
     id: 'vio105',
-    type: 'No Helmet',
+    type: ['No Helmet'],
     status: 'resolved',
     handler: 'Eve',
     timestamp: '2025-08-31T09:20:00Z',
@@ -844,7 +844,7 @@ export const mockViolations = [
   },
   {
     id: 'vio106',
-    type: 'No Mask',
+    type: ['No Mask'],
     status: 'open',
     handler: null,
     timestamp: '2025-08-31T09:25:00Z',
@@ -852,7 +852,7 @@ export const mockViolations = [
   },
   {
     id: 'vio107',
-    type: 'No Vest',
+    type: ['No Vest'],
     status: 'resolved',
     handler: 'David',
     timestamp: '2025-08-31T09:30:00Z',
@@ -860,7 +860,7 @@ export const mockViolations = [
   },
   {
     id: 'vio108',
-    type: 'Gloves Missing',
+    type: ['No Gloves'],
     status: 'resolved',
     handler: 'Bob',
     timestamp: '2025-08-31T09:35:00Z',
@@ -868,7 +868,7 @@ export const mockViolations = [
   },
   {
     id: 'vio109',
-    type: 'No Helmet',
+    type: ['No Helmet'],
     status: 'open',
     handler: null,
     timestamp: '2025-08-31T09:40:00Z',
@@ -876,7 +876,7 @@ export const mockViolations = [
   },
   {
     id: 'vio110',
-    type: 'No Mask',
+    type: ['No Mask'],
     status: 'resolved',
     handler: 'Charlie',
     timestamp: '2025-08-31T09:45:00Z',
@@ -884,7 +884,7 @@ export const mockViolations = [
   },
   {
     id: 'vio111',
-    type: 'No Vest',
+    type: ['No Vest'],
     status: 'open',
     handler: null,
     timestamp: '2025-08-31T09:50:00Z',
@@ -892,7 +892,7 @@ export const mockViolations = [
   },
   {
     id: 'vio112',
-    type: 'Gloves Missing',
+    type: ['No Gloves'],
     status: 'resolved',
     handler: 'Eve',
     timestamp: '2025-08-31T09:55:00Z',
@@ -900,7 +900,7 @@ export const mockViolations = [
   },
   {
     id: 'vio113',
-    type: 'No Helmet',
+    type: ['No Helmet'],
     status: 'resolved',
     handler: 'Alice',
     timestamp: '2025-08-31T10:00:00Z',
@@ -908,7 +908,7 @@ export const mockViolations = [
   },
   {
     id: 'vio114',
-    type: 'No Mask',
+    type: ['No Mask'],
     status: 'resolved',
     handler: 'David',
     timestamp: '2025-08-31T10:05:00Z',
@@ -916,7 +916,7 @@ export const mockViolations = [
   },
   {
     id: 'vio115',
-    type: 'No Vest',
+    type: ['No Vest'],
     status: 'resolved',
     handler: 'Bob',
     timestamp: '2025-08-31T10:10:00Z',
@@ -924,7 +924,7 @@ export const mockViolations = [
   },
   {
     id: 'vio116',
-    type: 'Gloves Missing',
+    type: ['No Gloves'],
     status: 'open',
     handler: null,
     timestamp: '2025-08-31T10:15:00Z',
@@ -932,7 +932,7 @@ export const mockViolations = [
   },
   {
     id: 'vio117',
-    type: 'No Helmet',
+    type: ['No Helmet'],
     status: 'resolved',
     handler: 'David',
     timestamp: '2025-08-31T10:20:00Z',
@@ -940,7 +940,7 @@ export const mockViolations = [
   },
   {
     id: 'vio118',
-    type: 'No Mask',
+    type: ['No Mask'],
     status: 'resolved',
     handler: 'Bob',
     timestamp: '2025-08-31T10:25:00Z',
@@ -948,7 +948,7 @@ export const mockViolations = [
   },
   {
     id: 'vio119',
-    type: 'No Vest',
+    type: ['No Vest'],
     status: 'resolved',
     handler: 'Bob',
     timestamp: '2025-08-31T10:30:00Z',
@@ -956,7 +956,7 @@ export const mockViolations = [
   },
   {
     id: 'vio120',
-    type: 'Gloves Missing',
+    type: ['No Gloves'],
     status: 'resolved',
     handler: 'Eve',
     timestamp: '2025-08-31T10:35:00Z',
@@ -964,7 +964,7 @@ export const mockViolations = [
   },
   {
     id: 'vio121',
-    type: 'No Helmet',
+    type: ['No Helmet'],
     status: 'open',
     handler: null,
     timestamp: '2025-08-31T10:40:00Z',
@@ -972,7 +972,7 @@ export const mockViolations = [
   },
   {
     id: 'vio122',
-    type: 'No Mask',
+    type: ['No Mask'],
     status: 'open',
     handler: null,
     timestamp: '2025-08-31T10:45:00Z',
@@ -980,7 +980,7 @@ export const mockViolations = [
   },
   {
     id: 'vio123',
-    type: 'No Vest',
+    type: ['No Vest'],
     status: 'resolved',
     handler: 'Charlie',
     timestamp: '2025-08-31T10:50:00Z',
@@ -988,7 +988,7 @@ export const mockViolations = [
   },
   {
     id: 'vio124',
-    type: 'Gloves Missing',
+    type: ['No Gloves'],
     status: 'open',
     handler: null,
     timestamp: '2025-08-31T10:55:00Z',
@@ -996,7 +996,7 @@ export const mockViolations = [
   },
   {
     id: 'vio125',
-    type: 'No Helmet',
+    type: ['No Helmet'],
     status: 'resolved',
     handler: 'Charlie',
     timestamp: '2025-08-31T11:00:00Z',
@@ -1004,7 +1004,7 @@ export const mockViolations = [
   },
   {
     id: 'vio126',
-    type: 'No Mask',
+    type: ['No Mask'],
     status: 'open',
     handler: null,
     timestamp: '2025-08-31T11:05:00Z',
@@ -1012,7 +1012,7 @@ export const mockViolations = [
   },
   {
     id: 'vio127',
-    type: 'No Vest',
+    type: ['No Vest'],
     status: 'open',
     handler: null,
     timestamp: '2025-08-31T11:10:00Z',
@@ -1020,7 +1020,7 @@ export const mockViolations = [
   },
   {
     id: 'vio128',
-    type: 'Gloves Missing',
+    type: ['No Gloves'],
     status: 'resolved',
     handler: 'Bob',
     timestamp: '2025-08-31T11:15:00Z',
@@ -1028,7 +1028,7 @@ export const mockViolations = [
   },
   {
     id: 'vio129',
-    type: 'No Helmet',
+    type: ['No Helmet'],
     status: 'resolved',
     handler: 'Charlie',
     timestamp: '2025-08-31T11:20:00Z',
@@ -1036,7 +1036,7 @@ export const mockViolations = [
   },
   {
     id: 'vio130',
-    type: 'No Mask',
+    type: ['No Mask'],
     status: 'resolved',
     handler: 'Bob',
     timestamp: '2025-08-31T11:25:00Z',
@@ -1044,7 +1044,7 @@ export const mockViolations = [
   },
   {
     id: 'vio131',
-    type: 'No Vest',
+    type: ['No Vest'],
     status: 'open',
     handler: null,
     timestamp: '2025-08-31T11:30:00Z',
@@ -1052,7 +1052,7 @@ export const mockViolations = [
   },
   {
     id: 'vio132',
-    type: 'Gloves Missing',
+    type: ['No Gloves'],
     status: 'resolved',
     handler: 'David',
     timestamp: '2025-08-31T11:35:00Z',
@@ -1060,7 +1060,7 @@ export const mockViolations = [
   },
   {
     id: 'vio133',
-    type: 'No Helmet',
+    type: ['No Helmet'],
     status: 'resolved',
     handler: 'David',
     timestamp: '2025-08-31T11:40:00Z',
@@ -1068,7 +1068,7 @@ export const mockViolations = [
   },
   {
     id: 'vio134',
-    type: 'No Mask',
+    type: ['No Mask'],
     status: 'resolved',
     handler: 'Charlie',
     timestamp: '2025-08-31T11:45:00Z',
@@ -1076,7 +1076,7 @@ export const mockViolations = [
   },
   {
     id: 'vio135',
-    type: 'No Vest',
+    type: ['No Vest'],
     status: 'resolved',
     handler: 'Alice',
     timestamp: '2025-08-31T11:50:00Z',
@@ -1084,7 +1084,7 @@ export const mockViolations = [
   },
   {
     id: 'vio136',
-    type: 'Gloves Missing',
+    type: ['No Gloves'],
     status: 'open',
     handler: null,
     timestamp: '2025-08-31T11:55:00Z',
@@ -1092,7 +1092,7 @@ export const mockViolations = [
   },
   {
     id: 'vio137',
-    type: 'No Helmet',
+    type: ['No Helmet'],
     status: 'open',
     handler: null,
     timestamp: '2025-08-31T12:00:00Z',
@@ -1100,7 +1100,7 @@ export const mockViolations = [
   },
   {
     id: 'vio138',
-    type: 'No Mask',
+    type: ['No Mask'],
     status: 'resolved',
     handler: 'Bob',
     timestamp: '2025-08-31T12:05:00Z',
@@ -1108,7 +1108,7 @@ export const mockViolations = [
   },
   {
     id: 'vio139',
-    type: 'No Vest',
+    type: ['No Vest'],
     status: 'open',
     handler: null,
     timestamp: '2025-08-31T12:10:00Z',
@@ -1116,7 +1116,7 @@ export const mockViolations = [
   },
   {
     id: 'vio140',
-    type: 'Gloves Missing',
+    type: ['No Gloves'],
     status: 'resolved',
     handler: 'David',
     timestamp: '2025-08-31T12:15:00Z',
@@ -1124,7 +1124,7 @@ export const mockViolations = [
   },
   {
     id: 'vio141',
-    type: 'No Helmet',
+    type: ['No Helmet'],
     status: 'resolved',
     handler: 'David',
     timestamp: '2025-08-31T12:20:00Z',
@@ -1132,7 +1132,7 @@ export const mockViolations = [
   },
   {
     id: 'vio142',
-    type: 'No Mask',
+    type: ['No Mask'],
     status: 'open',
     handler: null,
     timestamp: '2025-08-31T12:25:00Z',
@@ -1140,7 +1140,7 @@ export const mockViolations = [
   },
   {
     id: 'vio143',
-    type: 'No Vest',
+    type: ['No Vest'],
     status: 'open',
     handler: null,
     timestamp: '2025-08-31T12:30:00Z',
@@ -1148,7 +1148,7 @@ export const mockViolations = [
   },
   {
     id: 'vio144',
-    type: 'Gloves Missing',
+    type: ['No Gloves'],
     status: 'open',
     handler: null,
     timestamp: '2025-08-31T12:35:00Z',
@@ -1156,7 +1156,7 @@ export const mockViolations = [
   },
   {
     id: 'vio145',
-    type: 'No Helmet',
+    type: ['No Helmet'],
     status: 'open',
     handler: null,
     timestamp: '2025-08-31T12:40:00Z',
@@ -1164,7 +1164,7 @@ export const mockViolations = [
   },
   {
     id: 'vio146',
-    type: 'No Mask',
+    type: ['No Mask'],
     status: 'resolved',
     handler: 'Alice',
     timestamp: '2025-08-31T12:45:00Z',
@@ -1172,7 +1172,7 @@ export const mockViolations = [
   },
   {
     id: 'vio147',
-    type: 'No Vest',
+    type: ['No Vest'],
     status: 'open',
     handler: null,
     timestamp: '2025-08-31T12:50:00Z',
@@ -1180,7 +1180,7 @@ export const mockViolations = [
   },
   {
     id: 'vio148',
-    type: 'Gloves Missing',
+    type: ['No Gloves'],
     status: 'open',
     handler: null,
     timestamp: '2025-08-31T12:55:00Z',
@@ -1188,7 +1188,7 @@ export const mockViolations = [
   },
   {
     id: 'vio149',
-    type: 'No Helmet',
+    type: ['No Helmet'],
     status: 'open',
     handler: null,
     timestamp: '2025-08-31T13:00:00Z',
@@ -1196,7 +1196,7 @@ export const mockViolations = [
   },
   {
     id: 'vio150',
-    type: 'No Mask',
+    type: ['No Mask'],
     status: 'open',
     handler: null,
     timestamp: '2025-08-31T13:05:00Z',
@@ -1204,7 +1204,7 @@ export const mockViolations = [
   },
   {
     id: 'vio151',
-    type: 'No Vest',
+    type: ['No Vest'],
     status: 'resolved',
     handler: 'Bob',
     timestamp: '2025-08-31T13:10:00Z',
@@ -1212,7 +1212,7 @@ export const mockViolations = [
   },
   {
     id: 'vio152',
-    type: 'Gloves Missing',
+    type: ['No Gloves'],
     status: 'open',
     handler: null,
     timestamp: '2025-08-31T13:15:00Z',
@@ -1220,7 +1220,7 @@ export const mockViolations = [
   },
   {
     id: 'vio153',
-    type: 'No Helmet',
+    type: ['No Helmet'],
     status: 'resolved',
     handler: 'Bob',
     timestamp: '2025-08-31T13:20:00Z',
@@ -1228,7 +1228,7 @@ export const mockViolations = [
   },
   {
     id: 'vio154',
-    type: 'No Mask',
+    type: ['No Mask'],
     status: 'open',
     handler: null,
     timestamp: '2025-08-31T13:25:00Z',
@@ -1236,7 +1236,7 @@ export const mockViolations = [
   },
   {
     id: 'vio155',
-    type: 'No Vest',
+    type: ['No Vest'],
     status: 'open',
     handler: null,
     timestamp: '2025-08-31T13:30:00Z',
@@ -1244,7 +1244,7 @@ export const mockViolations = [
   },
   {
     id: 'vio156',
-    type: 'Gloves Missing',
+    type: ['No Gloves'],
     status: 'resolved',
     handler: 'Alice',
     timestamp: '2025-08-31T13:35:00Z',
@@ -1252,7 +1252,7 @@ export const mockViolations = [
   },
   {
     id: 'vio157',
-    type: 'No Helmet',
+    type: ['No Helmet'],
     status: 'resolved',
     handler: 'Alice',
     timestamp: '2025-08-31T13:40:00Z',
@@ -1260,7 +1260,7 @@ export const mockViolations = [
   },
   {
     id: 'vio158',
-    type: 'No Mask',
+    type: ['No Mask'],
     status: 'open',
     handler: null,
     timestamp: '2025-08-31T13:45:00Z',
@@ -1268,7 +1268,7 @@ export const mockViolations = [
   },
   {
     id: 'vio159',
-    type: 'No Vest',
+    type: ['No Vest'],
     status: 'resolved',
     handler: 'Bob',
     timestamp: '2025-08-31T13:50:00Z',
@@ -1276,7 +1276,7 @@ export const mockViolations = [
   },
   {
     id: 'vio160',
-    type: 'Gloves Missing',
+    type: ['No Gloves'],
     status: 'open',
     handler: null,
     timestamp: '2025-08-31T13:55:00Z',
@@ -1284,7 +1284,7 @@ export const mockViolations = [
   },
   {
     id: 'vio161',
-    type: 'No Helmet',
+    type: ['No Helmet'],
     status: 'open',
     handler: null,
     timestamp: '2025-08-31T14:00:00Z',
@@ -1292,7 +1292,7 @@ export const mockViolations = [
   },
   {
     id: 'vio162',
-    type: 'No Mask',
+    type: ['No Mask'],
     status: 'open',
     handler: null,
     timestamp: '2025-08-31T14:05:00Z',
@@ -1300,7 +1300,7 @@ export const mockViolations = [
   },
   {
     id: 'vio163',
-    type: 'No Vest',
+    type: ['No Vest'],
     status: 'resolved',
     handler: 'Charlie',
     timestamp: '2025-08-31T14:10:00Z',
@@ -1308,7 +1308,7 @@ export const mockViolations = [
   },
   {
     id: 'vio164',
-    type: 'Gloves Missing',
+    type: ['No Gloves'],
     status: 'open',
     handler: null,
     timestamp: '2025-08-31T14:15:00Z',
@@ -1316,7 +1316,7 @@ export const mockViolations = [
   },
   {
     id: 'vio165',
-    type: 'No Helmet',
+    type: ['No Helmet'],
     status: 'resolved',
     handler: 'Charlie',
     timestamp: '2025-08-31T14:20:00Z',
@@ -1324,7 +1324,7 @@ export const mockViolations = [
   },
   {
     id: 'vio166',
-    type: 'No Mask',
+    type: ['No Mask'],
     status: 'resolved',
     handler: 'Eve',
     timestamp: '2025-08-31T14:25:00Z',
@@ -1332,7 +1332,7 @@ export const mockViolations = [
   },
   {
     id: 'vio167',
-    type: 'No Vest',
+    type: ['No Vest'],
     status: 'resolved',
     handler: 'Bob',
     timestamp: '2025-08-31T14:30:00Z',
@@ -1340,7 +1340,7 @@ export const mockViolations = [
   },
   {
     id: 'vio168',
-    type: 'Gloves Missing',
+    type: ['No Gloves'],
     status: 'open',
     handler: null,
     timestamp: '2025-08-31T14:35:00Z',
@@ -1348,7 +1348,7 @@ export const mockViolations = [
   },
   {
     id: 'vio169',
-    type: 'No Helmet',
+    type: ['No Helmet'],
     status: 'open',
     handler: null,
     timestamp: '2025-08-31T14:40:00Z',
@@ -1356,7 +1356,7 @@ export const mockViolations = [
   },
   {
     id: 'vio170',
-    type: 'No Mask',
+    type: ['No Mask'],
     status: 'open',
     handler: null,
     timestamp: '2025-08-31T14:45:00Z',
@@ -1364,7 +1364,7 @@ export const mockViolations = [
   },
   {
     id: 'vio171',
-    type: 'No Vest',
+    type: ['No Vest'],
     status: 'open',
     handler: null,
     timestamp: '2025-08-31T14:50:00Z',
@@ -1372,7 +1372,7 @@ export const mockViolations = [
   },
   {
     id: 'vio172',
-    type: 'Gloves Missing',
+    type: ['No Gloves'],
     status: 'open',
     handler: null,
     timestamp: '2025-08-31T14:55:00Z',
@@ -1380,7 +1380,7 @@ export const mockViolations = [
   },
   {
     id: 'vio173',
-    type: 'No Helmet',
+    type: ['No Helmet'],
     status: 'open',
     handler: null,
     timestamp: '2025-08-31T15:00:00Z',
@@ -1388,7 +1388,7 @@ export const mockViolations = [
   },
   {
     id: 'vio174',
-    type: 'No Mask',
+    type: ['No Mask'],
     status: 'resolved',
     handler: 'David',
     timestamp: '2025-08-31T15:05:00Z',
@@ -1396,7 +1396,7 @@ export const mockViolations = [
   },
   {
     id: 'vio175',
-    type: 'No Vest',
+    type: ['No Vest'],
     status: 'open',
     handler: null,
     timestamp: '2025-08-31T15:10:00Z',
@@ -1404,7 +1404,7 @@ export const mockViolations = [
   },
   {
     id: 'vio176',
-    type: 'Gloves Missing',
+    type: ['No Gloves'],
     status: 'resolved',
     handler: 'Alice',
     timestamp: '2025-08-31T15:15:00Z',
@@ -1412,7 +1412,7 @@ export const mockViolations = [
   },
   {
     id: 'vio177',
-    type: 'No Helmet',
+    type: ['No Helmet'],
     status: 'resolved',
     handler: 'Bob',
     timestamp: '2025-08-31T15:20:00Z',
@@ -1420,7 +1420,7 @@ export const mockViolations = [
   },
   {
     id: 'vio178',
-    type: 'No Mask',
+    type: ['No Mask'],
     status: 'open',
     handler: null,
     timestamp: '2025-08-31T15:25:00Z',
@@ -1428,7 +1428,7 @@ export const mockViolations = [
   },
   {
     id: 'vio179',
-    type: 'No Vest',
+    type: ['No Vest'],
     status: 'open',
     handler: null,
     timestamp: '2025-08-31T15:30:00Z',
@@ -1436,7 +1436,7 @@ export const mockViolations = [
   },
   {
     id: 'vio180',
-    type: 'Gloves Missing',
+    type: ['No Gloves'],
     status: 'resolved',
     handler: 'Alice',
     timestamp: '2025-08-31T15:35:00Z',
@@ -1444,7 +1444,7 @@ export const mockViolations = [
   },
   {
     id: 'vio181',
-    type: 'No Helmet',
+    type: ['No Helmet'],
     status: 'open',
     handler: null,
     timestamp: '2025-08-31T15:40:00Z',
@@ -1452,7 +1452,7 @@ export const mockViolations = [
   },
   {
     id: 'vio182',
-    type: 'No Mask',
+    type: ['No Mask'],
     status: 'open',
     handler: null,
     timestamp: '2025-08-31T15:45:00Z',
@@ -1460,7 +1460,7 @@ export const mockViolations = [
   },
   {
     id: 'vio183',
-    type: 'No Vest',
+    type: ['No Vest'],
     status: 'resolved',
     handler: 'Eve',
     timestamp: '2025-08-31T15:50:00Z',
@@ -1468,7 +1468,7 @@ export const mockViolations = [
   },
   {
     id: 'vio184',
-    type: 'Gloves Missing',
+    type: ['No Gloves'],
     status: 'open',
     handler: null,
     timestamp: '2025-08-31T15:55:00Z',
@@ -1476,7 +1476,7 @@ export const mockViolations = [
   },
   {
     id: 'vio185',
-    type: 'No Helmet',
+    type: ['No Helmet'],
     status: 'open',
     handler: null,
     timestamp: '2025-08-31T16:00:00Z',
@@ -1484,7 +1484,7 @@ export const mockViolations = [
   },
   {
     id: 'vio186',
-    type: 'No Mask',
+    type: ['No Mask'],
     status: 'open',
     handler: null,
     timestamp: '2025-08-31T16:05:00Z',
@@ -1492,7 +1492,7 @@ export const mockViolations = [
   },
   {
     id: 'vio187',
-    type: 'No Vest',
+    type: ['No Vest'],
     status: 'open',
     handler: null,
     timestamp: '2025-08-31T16:10:00Z',
@@ -1500,7 +1500,7 @@ export const mockViolations = [
   },
   {
     id: 'vio188',
-    type: 'Gloves Missing',
+    type: ['No Gloves'],
     status: 'resolved',
     handler: 'Bob',
     timestamp: '2025-08-31T16:15:00Z',
@@ -1508,7 +1508,7 @@ export const mockViolations = [
   },
   {
     id: 'vio189',
-    type: 'No Helmet',
+    type: ['No Helmet'],
     status: 'open',
     handler: null,
     timestamp: '2025-08-31T16:20:00Z',
@@ -1516,7 +1516,7 @@ export const mockViolations = [
   },
   {
     id: 'vio190',
-    type: 'No Mask',
+    type: ['No Mask'],
     status: 'resolved',
     handler: 'Bob',
     timestamp: '2025-08-31T16:25:00Z',
@@ -1524,7 +1524,7 @@ export const mockViolations = [
   },
   {
     id: 'vio191',
-    type: 'No Vest',
+    type: ['No Vest'],
     status: 'resolved',
     handler: 'Bob',
     timestamp: '2025-08-31T16:30:00Z',
@@ -1532,7 +1532,7 @@ export const mockViolations = [
   },
   {
     id: 'vio192',
-    type: 'Gloves Missing',
+    type: ['No Gloves'],
     status: 'resolved',
     handler: 'Charlie',
     timestamp: '2025-08-31T16:35:00Z',
@@ -1540,7 +1540,7 @@ export const mockViolations = [
   },
   {
     id: 'vio193',
-    type: 'No Helmet',
+    type: ['No Helmet'],
     status: 'open',
     handler: null,
     timestamp: '2025-08-31T16:40:00Z',
@@ -1548,7 +1548,7 @@ export const mockViolations = [
   },
   {
     id: 'vio194',
-    type: 'No Mask',
+    type: ['No Mask'],
     status: 'open',
     handler: null,
     timestamp: '2025-08-31T16:45:00Z',
@@ -1556,7 +1556,7 @@ export const mockViolations = [
   },
   {
     id: 'vio195',
-    type: 'No Vest',
+    type: ['No Vest'],
     status: 'open',
     handler: null,
     timestamp: '2025-08-31T16:50:00Z',
@@ -1564,7 +1564,7 @@ export const mockViolations = [
   },
   {
     id: 'vio196',
-    type: 'Gloves Missing',
+    type: ['No Gloves'],
     status: 'resolved',
     handler: 'Bob',
     timestamp: '2025-08-31T16:55:00Z',
@@ -1572,7 +1572,7 @@ export const mockViolations = [
   },
   {
     id: 'vio197',
-    type: 'No Helmet',
+    type: ['No Helmet'],
     status: 'resolved',
     handler: 'Eve',
     timestamp: '2025-08-31T17:00:00Z',
@@ -1580,7 +1580,7 @@ export const mockViolations = [
   },
   {
     id: 'vio198',
-    type: 'No Mask',
+    type: ['No Mask'],
     status: 'open',
     handler: null,
     timestamp: '2025-08-31T17:05:00Z',
@@ -1588,7 +1588,7 @@ export const mockViolations = [
   },
   {
     id: 'vio199',
-    type: 'No Vest',
+    type: ['No Vest'],
     status: 'resolved',
     handler: 'David',
     timestamp: '2025-08-31T17:10:00Z',
@@ -1596,7 +1596,7 @@ export const mockViolations = [
   },
   {
     id: 'vio200',
-    type: 'Gloves Missing',
+    type: ['No Gloves'],
     status: 'resolved',
     handler: 'Alice',
     timestamp: '2025-08-31T17:15:00Z',
