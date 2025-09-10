@@ -4,7 +4,7 @@ import shibaInuResized from './images/shiba-inu_resized.png';
 export const mockViolations = [
   {
     id: 'vio1',
-    type: ['No Helmet', 'No Mask', 'No Mask', 'No Mask', 'No Gloves'],
+    type: ['No Helmet', 'No Mask', 'No Vest', 'No Gloves'],
     status: 'open',
     handler: null,
     timestamp: '2025-08-25T09:15:00Z',

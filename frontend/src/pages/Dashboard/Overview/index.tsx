@@ -91,7 +91,14 @@ export default function Dashboard(): React.ReactElement {
             <Grid size={{ xs: 12, md: 6, lg: 3 }} sx={{ px: 4, mb: 1 }}>
               <Card sx={{ minHeight: { xs: 120, md: 140 } }}>
                 <CardHeader
-                  title="Trend"
+                  title={
+                    <Typography variant={'h6'}>
+                      Trend{' '}
+                      <span style={{ color: 'grey', fontSize: '0.9rem' }}>
+                        Relative to yesterday
+                      </span>
+                    </Typography>
+                  }
                   slotProps={{
                     title: { fontSize: '0.9rem' },
                   }}
