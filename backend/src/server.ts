@@ -1,6 +1,6 @@
 import 'dotenv/config'
 console.log("JWT_SECRET >>>", process.env.JWT_SECRET);
-import {buildApp} from "./app.js";
+import {buildApp} from "./app";
 
 
 

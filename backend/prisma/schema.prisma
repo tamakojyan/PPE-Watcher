@@ -3,17 +3,18 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"                // Your current minimal setup: SQLite single file
-  url      = env("DATABASE_URL")     // Example: file:./db.sqlite
-}
-
-enum Role {
-  user
+  provider = "sqlite" // Your current minimal setup: SQLite single file
+  url      = env("DATABASE_URL") // Example: file:./db.sqlite
 }
 
 enum NotificationStatus {
-  read
-  unread
+  handled
+  unhandled
+}
+
+enum ViolationStatus {
+  open
+  resolved
 }
 
 enum NotificationType {
@@ -29,67 +30,85 @@ enum ViolationType {
 }
 
 model User {
-  id        String      @id                      // Manually assigned, e.g. "USR001"
-  email     String      @unique
+  id        String   @id // Manually assigned, e.g. "USR001"
+  email     String   @unique
   password  String
-  createdAt DateTime    @default(now())
+  createdAt DateTime @default(now())
 
   // Relations
-  bookmarks Violation[]     @relation("UserBookmarks")
-  notices   Notification[] @relation("UserNotices") // Notifications received by the user
+  violationBookmarks UserViolationBookmark[]
+  notices            Notification[]          @relation("UserNotices") // Notifications received by the user
 }
 
 model Contact {
-  id        String    @id                        // Manually assigned, e.g. "CON001"
+  id        String   @id // Manually assigned, e.g. "CON001"
   name      String
   email     String?
   phone     String?
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
-
 model Violation {
-  id          String    @id                      // Manually assigned, e.g. "VIO001"
-  kind        ViolationType                               // Type of violation (e.g. no_helmet)
+  id          String          @id // Manually assigned, e.g. "VIO001"
+  kinds       ViolationKind[] // Type of violation (e.g. no_helmet)
   confidence  Float?
-  ts          DateTime   @default(now())
+  ts          DateTime        @default(now())
   snapshotUrl String?
-  note        String?
-
-
-
+  status      ViolationStatus @default(open) //
+  handler     String?
   // Derived notifications (no alerts table, notifications directly linked to violation)
-  notices     Notification[]
-  bookmarkedBy User[]    @relation("UserBookmarks")
+  notices      Notification[]
+  bookmarkedBy UserViolationBookmark[]
 
   @@index([ts])
 }
 
+model ViolationKind {
+  violationId String
+  type        ViolationType // enum: no_helmet | no_mask | ...
+
+  violation Violation @relation(fields: [violationId], references: [id], onDelete: Cascade)
+
+  @@id([violationId, type]) // composite PK: unique pair
+  @@index([type]) // query by type faster
+}
+
 model Notification {
-  id           String              @id            // Manually assigned, e.g. "NTF001"
-  type         NotificationType    @default(violation)
-  kind         ViolationType                               // Type of violation (e.g. no_helmet)
-  status       NotificationStatus  @default(unread)
-  createdAt    DateTime            @default(now())
-  readAt       DateTime?
+  id        String             @id // Manually assigned, e.g. "NTF001"
+  type      NotificationType   @default(violation)
+  kind      ViolationType // Type of violation (e.g. no_helmet)
+  status    NotificationStatus @default(unhandled)
+  createdAt DateTime           @default(now())
+  readAt    DateTime?
 
   // The violation this notification refers to (optional, could be system notification)
-  violationId  String?
-  violation    Violation?          @relation(fields: [violationId], references: [id], onDelete: SetNull)
+  violationId String?
+  violation   Violation? @relation(fields: [violationId], references: [id], onDelete: SetNull)
 
   // The otification handledby (usually a user)
-  userId       String?
-  user         User?               @relation("UserNotices", fields: [userId], references: [id], onDelete: SetNull)
+  userId String?
+  user   User?   @relation("UserNotices", fields: [userId], references: [id], onDelete: SetNull)
 
   // Extra fields
-  message      String?
-  note         String?
+  message String?
+  note    String?
 
-
+  @@unique([userId, violationId, status])
   @@index([userId])
   @@index([violationId])
   @@index([status])
-  @@unique([userId, violationId, status])
+  @@index([userId, status, createdAt])
+}
+
+model UserViolationBookmark {
+  userId      String
+  violationId String
+  createdAt   DateTime @default(now())
+
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  violation Violation @relation(fields: [violationId], references: [id], onDelete: Cascade)
+
+  @@id([userId, violationId])
+  @@index([violationId, userId])
 }

@@ -3,7 +3,6 @@ import {
   Grid,
   Stack,
   Button,
-  TextField,
   Table,
   TableBody,
   TableHead,
@@ -11,39 +10,27 @@ import {
   TablePagination,
   TableCell,
   TableRow,
-  TableFooter,
-  TableSortLabel,
   Typography,
   Card,
   CardContent,
   CardHeader,
   Divider,
-  inputAdornmentClasses,
 } from '@mui/material';
-import { DatePicker } from '@mui/x-date-pickers';
-import { DateRangePicker } from '@mui/x-date-pickers-pro';
-import SearchIcon from '@mui/icons-material/Search';
-import InputAdornment from '@mui/material/InputAdornment';
-import IconButton from '@mui/material/IconButton';
-import ClearIcon from '@mui/icons-material/Clear';
-import { mockViolations } from '../../../mock/violations';
-import { useState } from 'react';
+
+import DateRangePicker from '../../../components/DateRangePicker';
+import KeywordSearch from '../../../components/KeywordSearch';
+
+import { useEffect, useState } from 'react';
 import { useTheme } from '@mui/material';
-import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
-import FavoriteIcon from '@mui/icons-material/Favorite';
-import { pink } from '@mui/material/colors';
+import { Violation } from '@/type';
+import api from '../../../api/client';
+import { useBookmarksFromOutlet } from '../../../hooks/useBookmarksFromOutlet';
+import Bookmarkbutton from '../../../components/BookmarkButton';
 
 export default function SearchViolations(): React.ReactElement {
-  type violationData = {
-    id: string;
-    type: string[];
-    status: string;
-    handler: null | string;
-    timestamp: string;
-    imageUrl: string;
-  };
+  const { loading } = useBookmarksFromOutlet();
+
   const theme = useTheme();
-  const [selected, setSelected] = useState<violationData | null>(null);
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState<number>(15);
   const handleChangePage = (_: unknown, newPage: number) => setPage(newPage);
@@ -52,11 +39,85 @@ export default function SearchViolations(): React.ReactElement {
     setRowsPerPage(value);
     setPage(0);
   };
-  const visibleRows = mockViolations.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
-  const handleRowClick = (row: violationData) => {
-    setSelected(row);
-    console.log(row);
+  const [total, setTotal] = useState<number>(0);
+  // UI-friendly row type for the table and detail panel
+  type ViolationRow = {
+    id: string;
+    typeText: string; // Flattened kinds into a string (e.g. "Helmet, Vest")
+    status: string;
+    timestampText: string; // Human-readable timestamp
+    imageUrl?: string | null;
+    confidence?: number;
+    handler?: string; // New: handler name or ID
   };
+
+  // Time formatter (local timezone, readable style)
+  const dtf = new Intl.DateTimeFormat(undefined, {
+    dateStyle: 'medium',
+    timeStyle: 'short',
+  });
+
+  // Convert raw ISO timestamp string into human-readable text
+  function formatTs(ts?: string): string {
+    if (!ts) return '';
+    const d = new Date(ts);
+    return Number.isNaN(+d) ? ts : dtf.format(d);
+  }
+  // Adapter: transform backend Violation object into UI-friendly ViolationRow
+  function toRow(v: Violation): ViolationRow {
+    return {
+      id: v.id,
+      // Convert kinds[] into a comma-separated string
+      typeText: (v.kinds ?? []).map((k) => k.type).join(', '),
+      status: v.status,
+      // Format timestamp into human-readable form
+      timestampText: formatTs(v.ts),
+      imageUrl: v.snapshotUrl ?? null,
+      confidence: v.confidence,
+      handler: v.handler, // Pass through handler for UI usage
+    };
+  }
+  const [visibleRows, setVisibleRows] = useState<ViolationRow[]>([]);
+
+  const [filters, setFilters] = useState<{ from?: number; to?: number; keyword?: string }>({});
+  // ------------------
+  // Filter UI
+  // ------------------
+
+  useEffect(() => {
+    // Build query params
+    const params: any = {
+      page,
+      pageSize: rowsPerPage,
+      sort: 'ts:desc',
+    };
+
+    // Add optional filters if present
+    if (filters.from) params.from = filters.from;
+    if (filters.to) params.to = filters.to;
+    if (filters.keyword) params.keyword = filters.keyword;
+
+    api
+      .get<{
+        items: Violation[];
+        total: number;
+        skip: number;
+        take: number;
+      }>('/violations', params)
+      .then((res) => {
+        // Convert API data into UI-friendly rows
+        console.log('API response', res);
+        setVisibleRows(res.items.map(toRow));
+        setTotal(res.total);
+      });
+  }, [page, rowsPerPage, filters]);
+
+  const [selected, setSelected] = useState<ViolationRow | null>(null);
+  const handleRowClick = (row: ViolationRow) => {
+    setSelected(row);
+  };
+  if (loading) return <div>Loading…</div>;
+
   return (
     <Grid
       container
@@ -82,42 +143,11 @@ export default function SearchViolations(): React.ReactElement {
           <Divider />
           <CardContent>
             <Grid container spacing={2}>
-              <Grid size={{ md: 3 }}>DatePicker</Grid>
-              <Grid size={{ md: 6 }}>
-                <TextField
-                  sx={{ width: '100%' }}
-                  label="Search"
-                  slotProps={{
-                    input: {
-                      startAdornment: (
-                        <InputAdornment position="start">
-                          <SearchIcon />
-                        </InputAdornment>
-                      ),
-                      endAdornment: (
-                        <InputAdornment position={'end'}>
-                          <IconButton>
-                            <ClearIcon />
-                          </IconButton>
-                        </InputAdornment>
-                      ),
-                    },
-                  }}
-                ></TextField>
-              </Grid>
-              <Grid size={{ md: 3 }}>
-                <Button
-                  variant={'contained'}
-                  sx={{
-                    mt: 1,
-                    boxShadow: 'none',
-                    transition: 'box-shadow 0.3 ease-in-out',
-                    '&:hover': { boxShadow: 6 },
-                  }}
-                >
-                  Search
-                </Button>
-              </Grid>
+              <DateRangePicker
+                onChange={({ from, to }) => setFilters((prev) => ({ ...prev, from, to }))}
+              />
+
+              <KeywordSearch onSearch={(keyword) => setFilters((prev) => ({ ...prev, keyword }))} />
             </Grid>
           </CardContent>
         </Card>
@@ -160,8 +190,8 @@ export default function SearchViolations(): React.ReactElement {
                           onClick={() => handleRowClick(row)}
                         >
                           <TableCell>{row.id}</TableCell>
-                          <TableCell>{row.type.join(',')}</TableCell>
-                          <TableCell>{row.timestamp}</TableCell>
+                          <TableCell>{row.typeText}</TableCell>
+                          <TableCell>{row.timestampText}</TableCell>
                           <TableCell>{row.handler}</TableCell>
                           <TableCell>{row.status}</TableCell>
                         </TableRow>
@@ -171,7 +201,7 @@ export default function SearchViolations(): React.ReactElement {
                 </TableContainer>
                 <TablePagination
                   component="div"
-                  count={mockViolations.length}
+                  count={total}
                   page={page}
                   onPageChange={handleChangePage}
                   rowsPerPage={rowsPerPage}
@@ -210,7 +240,7 @@ export default function SearchViolations(): React.ReactElement {
                 >
                   {selected ? (
                     <img
-                      src={selected?.imageUrl}
+                      src={selected?.imageUrl ?? ''}
                       alt=""
                       style={{
                         minHeight: 0,
@@ -240,9 +270,9 @@ export default function SearchViolations(): React.ReactElement {
                         <TableBody>
                           <TableRow>
                             <TableCell>{selected?.id}</TableCell>
-                            <TableCell>{selected?.type.join(',')}</TableCell>
+                            <TableCell>{selected?.typeText}</TableCell>
 
-                            <TableCell>{selected?.timestamp}</TableCell>
+                            <TableCell>{selected?.timestampText}</TableCell>
                             <TableCell>{selected?.status}</TableCell>
                             <TableCell>{selected?.handler}</TableCell>
                             <TableCell>
@@ -271,13 +301,7 @@ export default function SearchViolations(): React.ReactElement {
                               )}
                             </TableCell>
                             <TableCell>
-                              <IconButton>
-                                <FavoriteBorderIcon
-                                  sx={{
-                                    color: theme.palette.mode === 'light' ? pink[500] : pink[100],
-                                  }}
-                                />
-                              </IconButton>
+                              <Bookmarkbutton violationId={selected?.id} />
                             </TableCell>
                           </TableRow>
                         </TableBody>

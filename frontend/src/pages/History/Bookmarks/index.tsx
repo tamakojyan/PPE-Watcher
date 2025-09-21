@@ -21,30 +21,107 @@ import {
   inputAdornmentClasses,
 } from '@mui/material';
 import { useTheme } from '@mui/material';
-import { DatePicker } from '@mui/x-date-pickers';
-import { DateRangePicker } from '@mui/x-date-pickers-pro';
 import SearchIcon from '@mui/icons-material/Search';
 import InputAdornment from '@mui/material/InputAdornment';
 import IconButton from '@mui/material/IconButton';
 import ClearIcon from '@mui/icons-material/Clear';
-import { mockViolations } from '../../../mock/violations';
-import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
-import FavoriteIcon from '@mui/icons-material/Favorite';
-import { pink } from '@mui/material/colors';
-import { useState } from 'react';
-
+import React, { useState, useEffect } from 'react';
+import { getMyBookmarks } from '../../../api/bookmark';
+import { useBookmarksFromOutlet } from '../../../hooks/useBookmarksFromOutlet';
+import Bookmarkbutton from '../../../components/BookmarkButton';
+import DateRangePicker from '../../../components/DateRangePicker';
+import KeywordSearch from '../../../components/KeywordSearch';
+import api from '../../../api/client';
 export default function Bookmarks(): React.ReactElement {
+  const { loading, bookmarkIds } = useBookmarksFromOutlet();
+  const [filters, setFilters] = useState<{ from?: number; to?: number; keyword?: string }>({});
+
+  // UI-friendly row type (based on violation, not raw bookmark)
+  type ViolationRow = {
+    id: string;
+    typeText: string; // Flattened kinds into a string (e.g. "Helmet, Vest")
+    status: string;
+    timestampText: string; // Human-readable timestamp
+    imageUrl?: string | null;
+    confidence?: number;
+    handler?: string;
+  };
+
+  // --- Utilities for formatting ---
+  const dtf = new Intl.DateTimeFormat(undefined, {
+    dateStyle: 'medium',
+    timeStyle: 'short',
+  });
+
+  function formatTs(ts?: string): string {
+    if (!ts) return '';
+    const d = new Date(ts);
+    return Number.isNaN(+d) ? ts : dtf.format(d);
+  }
+
+  // --- Adapter: map bookmark item -> ViolationRow ---
+  type BookmarkItem = {
+    violationId: string;
+    createdAt: string;
+    violation: {
+      id: string;
+      status: string;
+      ts?: string;
+      snapshotUrl?: string | null;
+      confidence?: number;
+      handler?: string | null;
+      kinds?: { type: string }[];
+    };
+  };
+
+  function toViolationRow(item: BookmarkItem): ViolationRow {
+    const v = item.violation;
+    return {
+      id: v.id,
+      typeText: (v.kinds ?? []).map((k) => k.type).join(', '),
+      status: v.status,
+      timestampText: formatTs(v.ts), // show violation timestamp
+      imageUrl: v.snapshotUrl ?? null,
+      confidence: v.confidence,
+      handler: v.handler ?? undefined,
+    };
+  }
+
+  // --- Page component ---
+  const [BookmarkRows, setBookmarkRows] = useState<ViolationRow[]>([]);
+  const [total, setTotal] = useState(0);
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState<number>(15);
+
+  // Fetch bookmark violations whenever page or rowsPerPage changes
+  useEffect(() => {
+    (async () => {
+      const params = {
+        skip: page * rowsPerPage,
+        take: rowsPerPage,
+        sort: 'violation.ts:desc', // ✅ same format as backend expects
+        ...(filters.from ? { from: filters.from } : {}),
+        ...(filters.to ? { to: filters.to } : {}),
+        ...(filters.keyword ? { keyword: filters.keyword } : {}),
+      };
+
+      const res = await getMyBookmarks(params);
+      setBookmarkRows(res.items.map(toViolationRow));
+      setTotal(res.total);
+    })();
+  }, [page, rowsPerPage, filters]);
+
+  // Handlers for pagination
   const handleChangePage = (_: unknown, newPage: number) => setPage(newPage);
   const handleChangeRowsPerPage = (event: React.ChangeEvent<HTMLInputElement>) => {
     const value = parseInt(event.target.value, 10);
     setRowsPerPage(value);
     setPage(0);
   };
-  const visibleRows = mockViolations.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
 
   const theme = useTheme();
+  if (loading) return <div>Loading…</div>;
+
   return (
     <Grid
       container
@@ -70,42 +147,10 @@ export default function Bookmarks(): React.ReactElement {
           <Divider />
           <CardContent>
             <Grid container spacing={2}>
-              <Grid size={{ md: 3 }}>DatePicker</Grid>
-              <Grid size={{ md: 6 }}>
-                <TextField
-                  sx={{ width: '100%' }}
-                  label="Search"
-                  slotProps={{
-                    input: {
-                      startAdornment: (
-                        <InputAdornment position="start">
-                          <SearchIcon />
-                        </InputAdornment>
-                      ),
-                      endAdornment: (
-                        <InputAdornment position={'end'}>
-                          <IconButton>
-                            <ClearIcon />
-                          </IconButton>
-                        </InputAdornment>
-                      ),
-                    },
-                  }}
-                ></TextField>
-              </Grid>
-              <Grid size={{ md: 3 }}>
-                <Button
-                  variant={'contained'}
-                  sx={{
-                    mt: 1,
-                    boxShadow: 'none',
-                    transition: 'box-shadow 0.3 ease-in-out',
-                    '&:hover': { boxShadow: 6 },
-                  }}
-                >
-                  Search
-                </Button>
-              </Grid>
+              <DateRangePicker
+                onChange={({ from, to }) => setFilters((prev) => ({ ...prev, from, to }))}
+              />
+              <KeywordSearch onSearch={(keyword) => setFilters((prev) => ({ ...prev, keyword }))} />
             </Grid>
           </CardContent>
         </Card>
@@ -129,14 +174,15 @@ export default function Bookmarks(): React.ReactElement {
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {visibleRows.map((item) => (
-                    <TableRow key={item.id}>
-                      <TableCell>{item.id}</TableCell>
-                      <TableCell>{item.type.join(',')}</TableCell>
-                      <TableCell>{item.timestamp}</TableCell>
-                      <TableCell>{item.handler}</TableCell>
+                  {BookmarkRows.map((row) => (
+                    <TableRow key={row.id}>
+                      <TableCell>{row.id}</TableCell>
+                      <TableCell>{row.typeText}</TableCell>
+                      <TableCell>{row.timestampText}</TableCell>
+                      <TableCell>{row.handler}</TableCell>
+                      <TableCell>{row.status}</TableCell>
                       <TableCell>
-                        {item.status === 'open' ? (
+                        {row.status === 'open' ? (
                           <Button
                             variant={'contained'}
                             sx={{
@@ -166,13 +212,7 @@ export default function Bookmarks(): React.ReactElement {
                         </Button>
                       </TableCell>
                       <TableCell>
-                        <IconButton>
-                          <FavoriteIcon
-                            sx={{
-                              color: theme.palette.mode === 'light' ? pink[500] : pink[100],
-                            }}
-                          />
-                        </IconButton>
+                        <Bookmarkbutton violationId={row.id} />
                       </TableCell>
                     </TableRow>
                   ))}
@@ -181,7 +221,7 @@ export default function Bookmarks(): React.ReactElement {
             </TableContainer>
             <TablePagination
               component="div"
-              count={mockViolations.length}
+              count={total}
               page={page}
               onPageChange={handleChangePage}
               rowsPerPage={rowsPerPage}

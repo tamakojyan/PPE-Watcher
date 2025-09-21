@@ -16,8 +16,7 @@ import {
   IconButton,
 } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
-import { mockViolations } from 'mock/violations';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import ErrorIcon from '@mui/icons-material/Error';
 import { useTheme } from '@mui/material/styles';
 import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
@@ -25,17 +24,82 @@ import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
 import RemoveIcon from '@mui/icons-material/Remove';
 import VideocamIcon from '@mui/icons-material/Videocam';
 import EventIcon from '@mui/icons-material/Event';
-import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
-import FavoriteIcon from '@mui/icons-material/Favorite';
-import { pink } from '@mui/material/colors';
-
+import api from '../../../api/client';
+import { Violation } from '@/type';
+import { useBookmarksFromOutlet } from '../../../hooks/useBookmarksFromOutlet';
+import Bookmarkbutton from '../../../components/BookmarkButton';
 export default function Dashboard(): React.ReactElement {
+  const { loading } = useBookmarksFromOutlet();
+  type Stats = { open: number; resolved: number; all: number };
+  const [stats, setStats] = useState<Stats | null>(null);
+
+  useEffect(() => {
+    api
+      .get<{ open: number; resolved: number; all: number }>('/violations/stats/status')
+      .then((res) => {
+        setStats(res);
+      });
+  }, []);
+  console.log(stats);
   const navigate = useNavigate();
-  const openCount = mockViolations.filter((i) => i.status === 'open').length;
-  const resolvedCount = mockViolations.filter((i) => i.status === 'resolved').length;
-  const totalCount = mockViolations.length;
-  const openViolations = mockViolations.filter((i) => i.status === 'open');
+  const openCount = stats?.open ?? 0;
   const theme = useTheme();
+
+  // UI-friendly row type for the table and detail panel
+  type ViolationRow = {
+    id: string;
+    typeText: string; // Flattened kinds into a string (e.g. "Helmet, Vest")
+    status: string;
+    timestampText: string; // Human-readable timestamp
+    imageUrl?: string | null;
+    confidence?: number;
+    handler?: string; // New: handler name or ID
+  };
+
+  // Time formatter (local timezone, readable style)
+  const dtf = new Intl.DateTimeFormat(undefined, {
+    dateStyle: 'medium',
+    timeStyle: 'short',
+  });
+
+  // Convert raw ISO timestamp string into human-readable text
+  function formatTs(ts?: string): string {
+    if (!ts) return '';
+    const d = new Date(ts);
+    return Number.isNaN(+d) ? ts : dtf.format(d);
+  }
+  // Adapter: transform backend Violation object into UI-friendly ViolationRow
+  function toRow(v: Violation): ViolationRow {
+    return {
+      id: v.id,
+      // Convert kinds[] into a comma-separated string
+      typeText: (v.kinds ?? []).map((k) => k.type).join(', '),
+      status: v.status,
+      // Format timestamp into human-readable form
+      timestampText: formatTs(v.ts),
+      imageUrl: v.snapshotUrl ?? null,
+      confidence: v.confidence,
+      handler: v.handler, // Pass through handler for UI usage
+    };
+  }
+  const [visibleRows, setVisibleRows] = useState<ViolationRow[]>([]);
+
+  useEffect(() => {
+    api
+      .get<{
+        items: Violation[];
+        total: number;
+        skip: number;
+        take: number;
+      }>('/violations', { sort: 'ts:desc' })
+      .then((res) => {
+        // Convert API data into UI-friendly rows
+        setVisibleRows(res.items.map(toRow));
+        console.log(res.items);
+      });
+  }, []);
+
+  if (loading) return <div>Loading…</div>;
   return (
     <Stack direction={'column'} sx={{ flex: 1, minHeight: 0 }}>
       <Grid
@@ -197,11 +261,11 @@ export default function Dashboard(): React.ReactElement {
                 </TableRow>
               </TableHead>
               <TableBody>
-                {mockViolations.slice(0, 10).map((item) => (
+                {visibleRows.slice(0, 10).map((item) => (
                   <TableRow key={item.id}>
                     <TableCell>{item.id}</TableCell>
-                    <TableCell>{item.type.join(',')}</TableCell>
-                    <TableCell>{item.timestamp}</TableCell>
+                    <TableCell>{item.typeText}</TableCell>
+                    <TableCell>{item.timestampText}</TableCell>
                     <TableCell>{item.handler}</TableCell>
                     <TableCell>
                       {item.status === 'open' ? (
@@ -232,13 +296,7 @@ export default function Dashboard(): React.ReactElement {
                       </Button>
                     </TableCell>
                     <TableCell>
-                      <IconButton>
-                        <FavoriteBorderIcon
-                          sx={{
-                            color: theme.palette.mode === 'light' ? pink[500] : pink[100],
-                          }}
-                        />
-                      </IconButton>
+                      <Bookmarkbutton violationId={item.id} />
                     </TableCell>
                   </TableRow>
                 ))}

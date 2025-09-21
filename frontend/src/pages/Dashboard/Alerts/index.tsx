@@ -22,32 +22,40 @@ import {
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import ErrorIcon from '@mui/icons-material/Error';
 import ListAltIcon from '@mui/icons-material/ListAlt';
-import { mockViolations } from '../../../mock/violations';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useTheme } from '@mui/material';
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
 import FavoriteIcon from '@mui/icons-material/Favorite';
 import { pink } from '@mui/material/colors';
+import { Violation } from '@/type';
+import api from '../../../api/client';
+import { useBookmarksFromOutlet } from '../../../hooks/useBookmarksFromOutlet';
+import Bookmarkbutton from '../../../components/BookmarkButton';
 
 export default function Alerts(): React.ReactElement {
+  const { loading } = useBookmarksFromOutlet();
+  type Stats = { open: number; resolved: number; all: number };
+  const [stats, setStats] = useState<Stats | null>(null);
+
+  useEffect(() => {
+    api
+      .get<{ open: number; resolved: number; all: number }>('/violations/stats/status')
+      .then((res) => {
+        setStats(res);
+      });
+  }, []);
+  console.log(stats);
+
   const theme = useTheme();
-  const openCount = mockViolations.filter((i) => i.status === 'open').length;
-  const resolvedCount = mockViolations.filter((i) => i.status === 'resolved').length;
-  const totalCount = mockViolations.length;
-  const stats = [
+  const openCount = stats?.open ?? 0;
+  const resolvedCount = stats?.resolved;
+  const totalCount = stats?.all;
+  const status = [
     { label: 'Open', value: openCount, icon: <ErrorIcon color="error" /> },
     { label: 'Resolved', value: resolvedCount, icon: <CheckCircleIcon color="success" /> },
     { label: 'Total', value: totalCount, icon: <ListAltIcon color="primary" /> },
   ];
-  type violationData = {
-    id: string;
-    type: string[];
-    status: string;
-    handler: null | string;
-    timestamp: string;
-    imageUrl: string;
-  };
-  const [selected, setSelected] = useState<violationData | null>(null);
+
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState<number>(15);
   const handleChangePage = (_: unknown, newPage: number) => setPage(newPage);
@@ -56,13 +64,66 @@ export default function Alerts(): React.ReactElement {
     setRowsPerPage(value);
     setPage(0);
   };
-  const visibleRows = mockViolations
-    .filter((i) => i.status === 'open')
-    .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
-  const handleRowClick = (row: violationData) => {
-    setSelected(row);
-    console.log(row);
+  const [total, setTotal] = useState<number>(0);
+  // UI-friendly row type for the table and detail panel
+  type ViolationRow = {
+    id: string;
+    typeText: string; // Flattened kinds into a string (e.g. "Helmet, Vest")
+    status: string;
+    timestampText: string; // Human-readable timestamp
+    imageUrl?: string | null;
+    confidence?: number;
+    handler?: string; // New: handler name or ID
   };
+
+  // Time formatter (local timezone, readable style)
+  const dtf = new Intl.DateTimeFormat(undefined, {
+    dateStyle: 'medium',
+    timeStyle: 'short',
+  });
+
+  // Convert raw ISO timestamp string into human-readable text
+  function formatTs(ts?: string): string {
+    if (!ts) return '';
+    const d = new Date(ts);
+    return Number.isNaN(+d) ? ts : dtf.format(d);
+  }
+  // Adapter: transform backend Violation object into UI-friendly ViolationRow
+  function toRow(v: Violation): ViolationRow {
+    return {
+      id: v.id,
+      // Convert kinds[] into a comma-separated string
+      typeText: (v.kinds ?? []).map((k) => k.type).join(', '),
+      status: v.status,
+      // Format timestamp into human-readable form
+      timestampText: formatTs(v.ts),
+      imageUrl: v.snapshotUrl ?? null,
+      confidence: v.confidence,
+      handler: v.handler, // Pass through handler for UI usage
+    };
+  }
+  const [visibleRows, setVisibleRows] = useState<ViolationRow[]>([]);
+
+  useEffect(() => {
+    api
+      .get<{
+        items: Violation[];
+        total: number;
+        skip: number;
+        take: number;
+      }>('/violations', { status: 'open', page, pageSize: rowsPerPage, sort: 'ts:desc' })
+      .then((res) => {
+        // Convert API data into UI-friendly rows
+        setVisibleRows(res.items.map(toRow));
+        setTotal(res.total);
+      });
+  }, [page, rowsPerPage]);
+
+  const [selected, setSelected] = useState<ViolationRow | null>(null);
+  const handleRowClick = (row: ViolationRow) => {
+    setSelected(row);
+  };
+  if (loading) return <div>Loading…</div>;
 
   return (
     <Grid
@@ -77,7 +138,7 @@ export default function Alerts(): React.ReactElement {
 
       <Grid size={{ xs: 12 }} sx={{ color: 'primary.main' }}>
         <Grid container spacing={2}>
-          {stats.map((s) => (
+          {status.map((s) => (
             <Grid size={{ xs: 12, sm: 4 }} key={s.label}>
               <Card sx={{ p: 1 }}>
                 <CardContent>
@@ -106,23 +167,16 @@ export default function Alerts(): React.ReactElement {
                       <TableCell>Id</TableCell>
                       <TableCell>Type</TableCell>
                       <TableCell>Time</TableCell>
+                      <TableCell>Status</TableCell>
                     </TableRow>
                   </TableHead>
                   <TableBody>
                     {visibleRows.map((row) => (
-                      <TableRow
-                        key={row.id}
-                        hover
-                        sx={{
-                          cursor: 'pointer',
-                          bgcolor:
-                            selected?.id === row.id ? theme.palette.action.selected : undefined,
-                        }}
-                        onClick={() => handleRowClick(row)}
-                      >
+                      <TableRow key={row.id} hover onClick={() => handleRowClick(row)}>
                         <TableCell>{row.id}</TableCell>
-                        <TableCell>{row.type.join(',')}</TableCell>
-                        <TableCell>{row.timestamp}</TableCell>
+                        <TableCell>{row.typeText}</TableCell>
+                        <TableCell>{row.timestampText}</TableCell>
+                        <TableCell>{row.status}</TableCell>
                       </TableRow>
                     ))}
                   </TableBody>
@@ -130,7 +184,7 @@ export default function Alerts(): React.ReactElement {
               </TableContainer>
               <TablePagination
                 component="div"
-                count={mockViolations.filter((i) => i.status === 'open').length}
+                count={total}
                 page={page}
                 onPageChange={handleChangePage}
                 rowsPerPage={rowsPerPage}
@@ -152,7 +206,7 @@ export default function Alerts(): React.ReactElement {
               >
                 {selected ? (
                   <img
-                    src={selected?.imageUrl}
+                    src={selected?.imageUrl ?? ''} // ← use imageUrl, not snapshotUrl
                     alt=""
                     style={{
                       minHeight: 0,
@@ -182,14 +236,14 @@ export default function Alerts(): React.ReactElement {
                       <TableBody>
                         <TableRow>
                           <TableCell>{selected?.id}</TableCell>
-                          <TableCell>{selected?.type.join(',')}</TableCell>
-                          <TableCell>{selected?.timestamp}</TableCell>
+                          <TableCell>{selected?.typeText}</TableCell>
+                          <TableCell>{selected?.timestampText}</TableCell>
                           <TableCell>{selected?.status}</TableCell>
-                          <TableCell>{selected?.handler}</TableCell>
+                          <TableCell>{selected?.handler ?? '-'}</TableCell>
                           <TableCell>
                             {selected?.status === 'open' ? (
                               <Button
-                                variant={'contained'}
+                                variant="contained"
                                 sx={{
                                   maxWidth: 100,
                                   bgcolor:
@@ -202,23 +256,17 @@ export default function Alerts(): React.ReactElement {
                               </Button>
                             ) : (
                               <Button
-                                variant={'contained'}
+                                variant="contained"
                                 disabled
                                 sx={{ maxWidth: 100 }}
-                                color={'success'}
+                                color="success"
                               >
                                 Resolved
                               </Button>
                             )}
                           </TableCell>
                           <TableCell>
-                            <IconButton>
-                              <FavoriteBorderIcon
-                                sx={{
-                                  color: theme.palette.mode === 'light' ? pink[500] : pink[100],
-                                }}
-                              />
-                            </IconButton>
+                            <Bookmarkbutton violationId={selected?.id} />
                           </TableCell>
                         </TableRow>
                       </TableBody>

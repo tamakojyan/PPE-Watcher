@@ -21,26 +21,25 @@ import {
   inputAdornmentClasses,
   useTheme,
 } from '@mui/material';
-import { DatePicker } from '@mui/x-date-pickers';
-import { DateRangePicker } from '@mui/x-date-pickers-pro';
+
 import SearchIcon from '@mui/icons-material/Search';
 import InputAdornment from '@mui/material/InputAdornment';
 import IconButton from '@mui/material/IconButton';
 import ClearIcon from '@mui/icons-material/Clear';
 import { mockNotifications } from 'mock/notification';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import FavoriteIcon from '@mui/icons-material/Favorite';
 import { pink } from '@mui/material/colors';
-
-type Notification = {
-  id: string;
-  message: string;
-  kind: 'violation' | 'resolved';
-  status: 'read' | 'unread';
-  timestamp: string;
-  violationId: string;
-};
+import { Violation } from '@/type';
+import api from '../../../api/client';
+import HandleNoteAction from '../../../components/HandleNoteAction';
+import DateRangePicker from '../../../components/DateRangePicker';
+import KeywordSearch from '../../../components/KeywordSearch';
 export default function Notifications(): React.ReactElement {
+  const [filters, setFilters] = useState<{ from?: number; to?: number; keyword?: string }>({});
+
+  const [refreshTick, setRefreshTick] = useState(0);
+
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState<number>(15);
   const handleChangePage = (_: unknown, newPage: number) => setPage(newPage);
@@ -49,7 +48,80 @@ export default function Notifications(): React.ReactElement {
     setRowsPerPage(value);
     setPage(0);
   };
-  const visibleRows = mockNotifications.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
+  const [total, setTotal] = useState<number>(0);
+  // UI-friendly row type for the table and detail panel
+  // UI-friendly row type for notifications
+  type NotificationRow = {
+    id: string; // notification id
+    type: string; // notification type (e.g. "violation", "system")
+    kind?: string; // violation kind (e.g. "no_helmet")
+    status: string; // "unread" | "read"
+    createdAtText: string; // human-readable createdAt
+    readAtText?: string; // human-readable readAt (if any)
+    violationId?: string | null; // linked violation id (optional)
+    userId?: string | null; // owner/user id (optional)
+    message?: string | null; // message text (optional)
+    note?: string | null; // extra note (optional)
+  };
+
+  // Time formatter (local timezone, readable style)
+  const dtf = new Intl.DateTimeFormat(undefined, {
+    dateStyle: 'medium',
+    timeStyle: 'short',
+  });
+
+  // Convert raw ISO timestamp string into human-readable text
+  function formatTs(ts?: string): string {
+    if (!ts) return '';
+    const d = new Date(ts);
+    return Number.isNaN(+d) ? ts : dtf.format(d);
+  }
+  // Adapter: transform backend Violation object into UI-friendly ViolationRow
+  function toNotificationRow(n: any): NotificationRow {
+    return {
+      id: n.id,
+      type: String(n.type ?? ''),
+      kind: n.kind ? String(n.kind) : undefined,
+      status: String(n.status ?? ''),
+      createdAtText: formatTs(n.createdAt),
+      readAtText: formatTs(n.readAt),
+      violationId: n.violationId ?? null,
+      userId: n.userId ?? null,
+      message: n.message ?? null,
+      note: n.note ?? null,
+    };
+  }
+  const [visibleRows, setVisibleRows] = useState<NotificationRow[]>([]);
+
+  useEffect(() => {
+    const params: any = {
+      page,
+      pageSize: rowsPerPage,
+      sort: 'createdAt:desc', // 注意：notification 用 createdAt
+    };
+
+    if (filters.from) params.from = filters.from;
+    if (filters.to) params.to = filters.to;
+    if (filters.keyword) params.keyword = filters.keyword;
+
+    api
+      .get<{
+        items: Notification[];
+        total: number;
+        skip: number;
+        take: number;
+      }>('/notifications', params)
+      .then((res) => {
+        setVisibleRows(res.items.map(toNotificationRow));
+        setTotal(res.total);
+        console.log(res);
+      });
+  }, [page, rowsPerPage, filters, refreshTick]);
+
+  const [selected, setSelected] = useState<NotificationRow | null>(null);
+  const handleRowClick = (row: NotificationRow) => {
+    setSelected(row);
+  };
 
   const theme = useTheme();
   return (
@@ -77,49 +149,17 @@ export default function Notifications(): React.ReactElement {
           <Divider />
           <CardContent>
             <Grid container spacing={2}>
-              <Grid size={{ md: 3 }}>DatePicker</Grid>
-              <Grid size={{ md: 6 }}>
-                <TextField
-                  sx={{ width: '100%' }}
-                  label="Search"
-                  slotProps={{
-                    input: {
-                      startAdornment: (
-                        <InputAdornment position="start">
-                          <SearchIcon />
-                        </InputAdornment>
-                      ),
-                      endAdornment: (
-                        <InputAdornment position={'end'}>
-                          <IconButton>
-                            <ClearIcon />
-                          </IconButton>
-                        </InputAdornment>
-                      ),
-                    },
-                  }}
-                ></TextField>
-              </Grid>
-              <Grid size={{ md: 3 }}>
-                <Button
-                  variant={'contained'}
-                  sx={{
-                    mt: 1,
-                    boxShadow: 'none',
-                    transition: 'box-shadow 0.3 ease-in-out',
-                    '&:hover': { boxShadow: 6 },
-                  }}
-                >
-                  Search
-                </Button>
-              </Grid>
+              <DateRangePicker
+                onChange={({ from, to }) => setFilters((prev) => ({ ...prev, from, to }))}
+              />
+              <KeywordSearch onSearch={(keyword) => setFilters((prev) => ({ ...prev, keyword }))} />
             </Grid>
           </CardContent>
         </Card>
       </Grid>
       <Grid size={{ xs: 12 }} sx={{ flex: 1, minHeight: 0 }}>
         <Card>
-          <CardHeader title={'Bookmarks List'} />
+          <CardHeader title={'Notification List'} />
           <Divider />
           <CardContent>
             <TableContainer>
@@ -130,27 +170,42 @@ export default function Notifications(): React.ReactElement {
                     <TableCell>Message</TableCell>
                     <TableCell>Time</TableCell>
                     <TableCell>ViolationID</TableCell>
-                    <TableCell>kind</TableCell>
-                    <TableCell>status</TableCell>
+                    <TableCell>Type</TableCell>
+
+                    <TableCell>Kind</TableCell>
+                    <TableCell>Status</TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
                   {visibleRows.map((item) => (
-                    <TableRow key={item.id}>
-                      <TableCell>{item.id}</TableCell>
-                      <TableCell>{item.message}</TableCell>
-                      <TableCell>{item.timestamp}</TableCell>
-                      <TableCell>{item.violationId}</TableCell>
-                      <TableCell>{item.kind}</TableCell>
-                      <TableCell>{item.status}</TableCell>
-                    </TableRow>
+                    <>
+                      <TableRow key={item.id}>
+                        <TableCell>{item.id}</TableCell>
+                        <TableCell>{item.message}</TableCell>
+                        <TableCell>{item.createdAtText}</TableCell>
+                        <TableCell>{item.violationId}</TableCell>
+                        <TableCell>{item.type}</TableCell>
+                        <TableCell>{item.kind}</TableCell>
+                        <TableCell>{item.status}</TableCell>
+                        <TableCell>
+                          <HandleNoteAction
+                            id={item.id}
+                            disabled={item.status === 'handled'}
+                            setRefreshTick={setRefreshTick} // disable when already handled
+                          />
+                        </TableCell>
+                      </TableRow>
+                      <TableRow>
+                        <TableCell colSpan={6}>Note: {item.note ?? 'No note yet'}</TableCell>
+                      </TableRow>
+                    </>
                   ))}
                 </TableBody>
               </Table>
             </TableContainer>
             <TablePagination
               component="div"
-              count={mockNotifications.length}
+              count={total}
               page={page}
               onPageChange={handleChangePage}
               rowsPerPage={rowsPerPage}

@@ -4,6 +4,9 @@ import { ThemeProvider } from '@mui/material/styles';
 import { CssBaseline, createTheme, useMediaQuery } from '@mui/material';
 import { useState, useMemo } from 'react';
 import { createContext, useContext } from 'react';
+import { LocalizationProvider } from '@mui/x-date-pickers';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import dayjs from 'dayjs';
 
 export const ThemeControlContext = createContext<{ toggleTheme: () => void } | null>(null);
 export const useThemeControl = () => {
@@ -23,7 +26,9 @@ export default function App() {
     <ThemeProvider theme={theme}>
       <CssBaseline />
       <ThemeControlContext.Provider value={{ toggleTheme }}>
-        <RouterProvider router={router} />
+        <LocalizationProvider dateAdapter={AdapterDayjs}>
+          <RouterProvider router={router} />
+        </LocalizationProvider>
       </ThemeControlContext.Provider>
     </ThemeProvider>
   );

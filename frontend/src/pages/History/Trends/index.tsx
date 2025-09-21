@@ -29,49 +29,140 @@ import {
   Cell,
 } from 'recharts';
 import { format, startOfDay } from 'date-fns';
-import { useMemo, useState } from 'react';
-type violationData = {
-  id: string;
-  type: string[];
-  status: string;
-  handler: null | string;
-  timestamp: string;
-  imageUrl: string;
-};
-const allTypes = ['No Mask', 'No Helmet', 'No Vest', 'No Gloves'] as const;
+import { useEffect, useMemo, useState } from 'react';
+import { Violation } from '@/type';
+import api from '../../../api/client';
+import DateRangePicker from '../../../components/DateRangePicker';
+
+// ---- Types for chart buckets ----
+const allTypes = ['no_mask', 'no_helmet', 'no_vest', 'no_gloves'] as const;
 type PPEType = (typeof allTypes)[number];
-type bucket = {
-  date: string;
+
+type Bucket = {
+  date: string; // yyyy-MM-dd
   total: number;
   open: number;
   resolved: number;
   byType: Record<PPEType, number>;
 };
 
-function groupByDay(violations: violationData[]): bucket[] {
-  const map = new Map<string, bucket>();
-  for (const v of violations) {
-    const d = startOfDay(new Date(v.timestamp));
+// ---- Build UI row (optional, if your page still shows a table etc.) ----
+type ViolationRow = {
+  id: string;
+  typeText: string;
+  status: string;
+  timestampText: string;
+  imageUrl?: string | null;
+  confidence?: number;
+  handler?: string | null;
+};
+
+// Human readable date-time
+const dtf = new Intl.DateTimeFormat(undefined, {
+  dateStyle: 'medium',
+  timeStyle: 'short',
+});
+
+function formatTs(ts?: string): string {
+  if (!ts) return '';
+  const d = new Date(ts);
+  return Number.isNaN(+d) ? ts : dtf.format(d);
+}
+
+function toRow(v: Violation): ViolationRow {
+  return {
+    id: v.id,
+    typeText: (v.kinds ?? []).map((k) => k.type).join(', '),
+    status: v.status,
+    timestampText: formatTs(v.ts),
+    imageUrl: v.snapshotUrl ?? null,
+    confidence: v.confidence,
+    handler: v.handler ?? null,
+  };
+}
+
+// ---- Aggregate by day from RAW violations ----
+function groupByDay(list: Violation[]): Bucket[] {
+  const map = new Map<string, Bucket>();
+
+  for (const v of list) {
+    // normalize to local day
+    const d = startOfDay(new Date(v.ts));
     const key = format(d, 'yyyy-MM-dd');
+
     if (!map.has(key)) {
       map.set(key, {
         date: key,
         total: 0,
         open: 0,
         resolved: 0,
-        byType: Object.fromEntries(allTypes.map((t) => [t, 0])) as Record<string, number>,
+        byType: Object.fromEntries(allTypes.map((t) => [t, 0])) as Record<PPEType, number>,
       });
     }
-    const bucket = map.get(key)!;
-    bucket.total += 1;
-    if (v.status === 'open') bucket.open += 1;
-    else if (v.status === 'resolved') bucket.resolved += 1;
-    v.type.forEach((t) => (bucket.byType[t as PPEType] += 1));
+
+    const b = map.get(key)!;
+    b.total += 1;
+    if (v.status === 'open') b.open += 1;
+    else if (v.status === 'resolved') b.resolved += 1;
+
+    for (const k of v.kinds ?? []) {
+      const t = k.type as PPEType;
+      if (t in b.byType) b.byType[t] += 1;
+    }
   }
+
   return Array.from(map.values()).sort((a, b) => a.date.localeCompare(b.date));
 }
+
 export default function Trends(): React.ReactElement {
+  const [dateRange, setDateRange] = useState<{ from?: number; to?: number }>({});
+
   const theme = useTheme();
+
+  // Keep RAW violations for aggregation
+  const [violations, setViolations] = useState<Violation[]>([]);
+  // Fetch once
+  useEffect(() => {
+    (async () => {
+      const res = await api.get<{ items: Violation[]; total: number; skip: number; take: number }>(
+        '/violations',
+        {
+          skip: 0,
+          take: 1000,
+          sort: 'ts:desc',
+          ...(dateRange.from ? { from: dateRange.from } : {}),
+          ...(dateRange.to ? { to: dateRange.to } : {}),
+        }
+      );
+      setViolations(res.items);
+    })();
+  }, [dateRange]);
+
+  // Aggregate buckets from RAW data
+  const buckets = useMemo(() => groupByDay(violations), [violations]);
+
+  // Selected day (default: last bucket if exists)
+  const [selected, setSelected] = useState<Bucket | null>(null);
+  useEffect(() => {
+    if (buckets.length) setSelected(buckets[buckets.length - 1]);
+    else setSelected(null);
+  }, [buckets]);
+
+  // Chart type switch
+  const [chartType, setChartType] = useState<'line' | 'bar'>('line');
+
+  // Pie data based on selected day
+  const pieData = useMemo(() => {
+    if (!selected) return [];
+    return Object.entries(selected.byType)
+      .map(([name, value]) => ({ name, value }))
+      .filter((d) => d.value > 0);
+  }, [selected]);
+
+  // Colors
+  const colorOpen = theme.palette.error.main;
+  const colorResolved = theme.palette.success.main;
+  const colorTotal = theme.palette.primary.main;
   const pieColors = [
     theme.palette.primary.main,
     theme.palette.secondary.main,
@@ -80,28 +171,15 @@ export default function Trends(): React.ReactElement {
     theme.palette.success.main,
     theme.palette.error.main,
   ];
-  const colorOpen = theme.palette.error.main;
-  const colorResolved = theme.palette.success.main;
-  const colorTotal = theme.palette.primary.main;
-  const buckets = useMemo(() => groupByDay(mockViolations), []);
-  const [selected, setSelected] = useState<bucket | null>(buckets.at(-1) ?? null);
-  const [chartType, setChartType] = useState<'line' | 'bar'>('line');
-  const pieData = useMemo(() => {
-    if (!selected) return [];
-    return Object.entries(selected.byType)
-      .map(([name, value]) => ({ name, value }))
-      .filter((d) => d.value > 0);
-  }, [selected]);
-  const CustomHoverTooltip = ({ active, label }: any) => {
+
+  // Tooltip component to update selected day on hover
+  function CustomHoverTooltip({ active, label }: { active?: boolean; label?: string }) {
     if (active && label) {
       const b = buckets.find((d) => d.date === label);
-      if (b && selected?.date !== b.date) {
-        setSelected(b);
-      }
+      if (b && b.date !== selected?.date) setSelected(b);
     }
-    return null; // 我们用右侧 details 显示信息，这里隐藏 Tooltip 面板
-  };
-
+    return null;
+  }
   return (
     <Grid container sx={{ flex: 1, minHeight: 0, bgcolor: 'background.paper' }} direction="column">
       <Grid size={{ xs: 12 }}>
@@ -135,7 +213,9 @@ export default function Trends(): React.ReactElement {
           </Grid>
         </Grid>
         <Grid size={{ xs: 12 }}>
-          <Chip label={'TOOlBAR'} />
+          <Grid container spacing={2}>
+            <DateRangePicker onChange={({ from, to }) => setDateRange({ from, to })} />
+          </Grid>
         </Grid>
       </Grid>
       <Grid container size={{ xs: 12 }} sx={{ flex: 1, minHeight: 0 }}>
