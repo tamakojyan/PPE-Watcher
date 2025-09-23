@@ -31,11 +31,9 @@ export async function getMyBookmarks(params: {
 }): Promise<BookmarkResponse> {
   return api.get<BookmarkResponse>('/me/bookmarks', params);
 }
-/** Lightweight: fetch only violation ids for fast global mark */
+
 export async function getMyBookmarkIds(): Promise<string[]> {
-  // You already have (or will add) this backend route:
-  // GET /me/bookmark-ids  ->  ["VIO001", "VIO002", ...]
-  return api.get('/me/bookmark-ids');
+  return api.get<string[]>('/me/bookmark-ids'); // 直接返回就是数组
 }
 
 /** Add a bookmark (optimistic update recommended on UI) */

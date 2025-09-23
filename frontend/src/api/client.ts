@@ -114,7 +114,7 @@ export function createClient(baseURL = DEFAULT_BASE, getToken?: () => string | n
   return { baseURL, request, get, post, put, patch, del };
 }
 
-// ✅ Default singleton: reads token from localStorage (customize as needed)
+// Default singleton: reads token from localStorage (customize as needed)
 const api = createClient(DEFAULT_BASE, () => localStorage.getItem('token') || undefined);
 
 export default api;

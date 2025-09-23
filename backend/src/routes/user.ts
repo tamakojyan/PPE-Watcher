@@ -1,6 +1,7 @@
     // src/routes/user.ts
     import type { FastifyInstance,FastifyRequest } from 'fastify';
     import { prisma } from '@lib/prisma';
+    import { Prisma } from '@prisma/client'
     import { getPagination, parseSort } from './_utils';
 
     type AuthedReq = FastifyRequest & { user: { id: string } };
@@ -36,9 +37,9 @@
                 }
                 : {};
 
-            const orderBy =
-                parseSort((req.query as any)?.sort, ['createdAt', 'id', 'email']) ||
-                [{ createdAt: 'desc' as const }];
+            const orderBy: Prisma.UserOrderByWithRelationInput[] =
+                (parseSort((req.query as any)?.sort, ['createdAt', 'id', 'email']) as Prisma.UserOrderByWithRelationInput[]) ||
+                [{ createdAt: 'desc' }];
 
             const [items, total] = await Promise.all([
                 prisma.user.findMany({ where, skip, take, orderBy }),

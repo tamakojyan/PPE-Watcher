@@ -118,3 +118,10 @@ model UserViolationBookmark {
   @@id([userId, violationId])
   @@index([violationId, userId])
 }
+
+model SystemConfig {
+  id        Int      @id @default(autoincrement()) // Primary key, auto-increment
+  key       String   @unique                      // Configuration key, e.g., "smtp_host"
+  value     String                                // Configuration value (string or JSON string)
+  updatedAt DateTime @updatedAt                   // Timestamp of the last update (auto-managed)
+}

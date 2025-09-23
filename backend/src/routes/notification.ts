@@ -1,5 +1,6 @@
 import type { FastifyInstance } from 'fastify';
 import { prisma } from '@lib/prisma';
+import {Prisma } from '@prisma/client';
 import { getPagination, toEnum, toDate, parseSort, NOTIF_STATUS, NOTIF_TYPES } from './_utils';
 
 export default async function notificationRoutes(app: FastifyInstance) {
@@ -69,10 +70,10 @@ export default async function notificationRoutes(app: FastifyInstance) {
 
         if (where.AND.length === 0) delete where.AND;
 
-        const orderBy =
-            parseSort(q.sort, ['createdAt', 'status', 'id']) || [{ createdAt: 'desc' as const }];
+        const orderBy: Prisma.NotificationOrderByWithRelationInput[] =
+            (parseSort(q.sort, ['createdAt', 'status', 'id']) as Prisma.NotificationOrderByWithRelationInput[]) ||
+            [{ createdAt: 'desc' }];
 
-        // 🔹 日志：调试用
         req.log.info({ keyword, where, skip, take, orderBy }, 'notification query');
 
         const [items, total] = await Promise.all([

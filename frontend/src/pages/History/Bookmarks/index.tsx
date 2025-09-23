@@ -24,20 +24,22 @@ import Bookmarkbutton from '../../../components/BookmarkButton';
 import DateRangePicker from '../../../components/DateRangePicker';
 import KeywordSearch from '../../../components/KeywordSearch';
 import ViolationDetailDialog from '../../../components/ViolationDetailDialog';
+import { Violation, ViolationKind, ViolationType, ViolationStatus } from '@/type';
 
 export default function Bookmarks(): React.ReactElement {
-  const { loading, bookmarkIds } = useBookmarksFromOutlet();
+  const { loading } = useBookmarksFromOutlet();
   const [filters, setFilters] = useState<{ from?: number; to?: number; keyword?: string }>({});
 
-  // UI-friendly row type (based on violation, not raw bookmark)
+  // UI-friendly row type
   type ViolationRow = {
     id: string;
-    typeText: string; // Flattened kinds into a string (e.g. "Helmet, Vest")
+    typeText: string;
     status: string;
-    timestampText: string; // Human-readable timestamp
+    timestampText: string;
     imageUrl?: string | null;
     confidence?: number;
     handler?: string;
+    raw: Violation; // ✅ keep full Violation for Detail
   };
 
   // --- Utilities for formatting ---
@@ -52,7 +54,7 @@ export default function Bookmarks(): React.ReactElement {
     return Number.isNaN(+d) ? ts : dtf.format(d);
   }
 
-  // --- Adapter: map bookmark item -> ViolationRow ---
+  // --- Bookmark API type ---
   type BookmarkItem = {
     violationId: string;
     createdAt: string;
@@ -67,32 +69,53 @@ export default function Bookmarks(): React.ReactElement {
     };
   };
 
+  // --- Adapter ---
   function toViolationRow(item: BookmarkItem): ViolationRow {
     const v = item.violation;
+
+    // Build full Violation for DetailDialog
+    const violation: Violation = {
+      id: v.id,
+      status: v.status as ViolationStatus,
+      ts: v.ts ?? '',
+      snapshotUrl: v.snapshotUrl ?? undefined,
+      confidence: v.confidence,
+      handler: v.handler ?? '',
+      kinds: (v.kinds ?? []).map(
+        (k): ViolationKind => ({
+          violationId: v.id,
+          type: k.type as ViolationType,
+        })
+      ),
+      bookmarkedBy: [], // default
+    };
+
     return {
       id: v.id,
       typeText: (v.kinds ?? []).map((k) => k.type).join(', '),
       status: v.status,
-      timestampText: formatTs(v.ts), // show violation timestamp
+      timestampText: formatTs(v.ts),
       imageUrl: v.snapshotUrl ?? null,
       confidence: v.confidence,
       handler: v.handler ?? undefined,
+      raw: violation,
     };
   }
 
-  // --- Page component ---
+  // --- State ---
   const [BookmarkRows, setBookmarkRows] = useState<ViolationRow[]>([]);
   const [total, setTotal] = useState(0);
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState<number>(15);
+  const [selectedViolation, setSelectedViolation] = useState<Violation | null>(null);
 
-  // Fetch bookmark violations whenever page or rowsPerPage changes
+  // Fetch bookmark violations
   useEffect(() => {
     (async () => {
       const params = {
         skip: page * rowsPerPage,
         take: rowsPerPage,
-        sort: 'violation.ts:desc', // ✅ same format as backend expects
+        sort: 'violation.ts:desc',
         ...(filters.from ? { from: filters.from } : {}),
         ...(filters.to ? { to: filters.to } : {}),
         ...(filters.keyword ? { keyword: filters.keyword } : {}),
@@ -117,11 +140,7 @@ export default function Bookmarks(): React.ReactElement {
   if (loading) return <div>Loading…</div>;
 
   return (
-    <Grid
-      container
-      sx={{ flex: 1, minHeight: 0, bgcolor: 'background.paper' }}
-      direction={'column'}
-    >
+    <Grid container sx={{ flex: 1, minHeight: 0, bgcolor: 'background.paper' }} direction="column">
       <Grid size={{ xs: 12 }}>
         <Grid container>
           <Grid size={{ xs: 6, md: 10 }}>
@@ -135,6 +154,7 @@ export default function Bookmarks(): React.ReactElement {
           </Grid>
         </Grid>
       </Grid>
+
       <Grid size={{ xs: 12 }}>
         <Card sx={{ my: 3 }}>
           <CardHeader title="ToolBar" />
@@ -149,6 +169,7 @@ export default function Bookmarks(): React.ReactElement {
           </CardContent>
         </Card>
       </Grid>
+
       <Grid size={{ xs: 12 }} sx={{ flex: 1, minHeight: 0 }}>
         <Card>
           <CardHeader title={'Bookmarks List'} />
@@ -176,32 +197,11 @@ export default function Bookmarks(): React.ReactElement {
                       <TableCell>{row.handler}</TableCell>
                       <TableCell>{row.status}</TableCell>
                       <TableCell>
-                        {row.status === 'open' ? (
-                          <Button
-                            variant={'contained'}
-                            sx={{
-                              maxWidth: 100,
-                              bgcolor:
-                                theme.palette.mode === 'light'
-                                  ? theme.palette.error.main
-                                  : '#5f0e06',
-                            }}
-                          >
-                            Resolve
-                          </Button>
-                        ) : (
-                          <Button
-                            variant={'contained'}
-                            disabled
-                            sx={{ maxWidth: 100 }}
-                            color={'success'}
-                          >
-                            Resolved
-                          </Button>
-                        )}
-                      </TableCell>
-                      <TableCell>
-                        <Button sx={{ maxWidth: 100 }} variant={'contained'}>
+                        <Button
+                          sx={{ maxWidth: 100 }}
+                          variant="contained"
+                          onClick={() => setSelectedViolation(row.raw)}
+                        >
                           Detail
                         </Button>
                       </TableCell>
@@ -225,6 +225,13 @@ export default function Bookmarks(): React.ReactElement {
           </CardContent>
         </Card>
       </Grid>
+
+      {/* ✅ Violation Detail Dialog */}
+      <ViolationDetailDialog
+        open={!!selectedViolation}
+        violation={selectedViolation}
+        onClose={() => setSelectedViolation(null)}
+      />
     </Grid>
   );
 }

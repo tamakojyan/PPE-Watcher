@@ -11,6 +11,7 @@ import violations from "./routes/violation";
 import notifications from "./routes/notification";
 import auth from "./routes/auth";
 import bookmark from "./routes/bookmark";
+import configRoutes from "@routes/config";
 
 export function buildApp(): FastifyInstance {
     const app = fastify({
@@ -58,5 +59,6 @@ export function buildApp(): FastifyInstance {
     app.register(violations);
     app.register(notifications);
     app.register(bookmark);
+    app.register(configRoutes)
     return app;
 }
