@@ -1,9 +1,7 @@
 import * as react from 'react';
 import {
   Grid,
-  Stack,
   Button,
-  TextField,
   Table,
   TableBody,
   TableHead,
@@ -11,27 +9,22 @@ import {
   TablePagination,
   TableCell,
   TableRow,
-  TableFooter,
-  TableSortLabel,
   Typography,
   Card,
   CardContent,
   CardHeader,
   Divider,
-  inputAdornmentClasses,
 } from '@mui/material';
 import { useTheme } from '@mui/material';
-import SearchIcon from '@mui/icons-material/Search';
-import InputAdornment from '@mui/material/InputAdornment';
-import IconButton from '@mui/material/IconButton';
-import ClearIcon from '@mui/icons-material/Clear';
+
 import React, { useState, useEffect } from 'react';
 import { getMyBookmarks } from '../../../api/bookmark';
 import { useBookmarksFromOutlet } from '../../../hooks/useBookmarksFromOutlet';
 import Bookmarkbutton from '../../../components/BookmarkButton';
 import DateRangePicker from '../../../components/DateRangePicker';
 import KeywordSearch from '../../../components/KeywordSearch';
-import api from '../../../api/client';
+import ViolationDetailDialog from '../../../components/ViolationDetailDialog';
+
 export default function Bookmarks(): React.ReactElement {
   const { loading, bookmarkIds } = useBookmarksFromOutlet();
   const [filters, setFilters] = useState<{ from?: number; to?: number; keyword?: string }>({});
@@ -120,6 +113,7 @@ export default function Bookmarks(): React.ReactElement {
   };
 
   const theme = useTheme();
+
   if (loading) return <div>Loading…</div>;
 
   return (

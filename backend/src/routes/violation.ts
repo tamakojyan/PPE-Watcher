@@ -1,6 +1,7 @@
 // src/routes/violation.ts
 import type { FastifyInstance } from 'fastify';
 import { prisma } from '@lib/prisma';
+import { Prisma } from '@prisma/client'
 import {
     getPagination,
     toDate,
@@ -80,7 +81,10 @@ export default async function violationRoutes(app: FastifyInstance) {
         }
 
         const orderBy =
-            parseSort(q.sort, ['ts', 'confidence', 'status', 'id']) || [{ ts: 'desc' as const }];
+            parseSort<Prisma.ViolationOrderByWithRelationInput>(
+                (req.query as any)?.sort,
+                ['ts', 'status', 'id']
+            ) || [{ ts: 'desc' }];
 
         app.log.info({ rawQuery: q, where, skip, take, orderBy }, 'violations query');
 

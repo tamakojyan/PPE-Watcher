@@ -1,65 +1,77 @@
 import type { FastifyInstance } from 'fastify';
 import { prisma } from '@lib/prisma';
-import { getPagination, parseSort, toDate } from './_utils';
 
 export default async function contactRoutes(app: FastifyInstance) {
     /**
-     * GET /api/contacts
-     * Query: q, from, to, page/pageSize | skip/take, sort
-     * sort whitelist: ['createdAt','updatedAt','name','id']
+     * GET /contacts
+     * List all contacts
      */
-    app.get('/contacts', async (req) => {
-        const { skip, take } = getPagination(req);
-        const query = req.query as any;
-
-        const q = (query?.q as string | undefined)?.trim();
-        const from = toDate(query?.from);
-        const to = toDate(query?.to);
-
-        const where: any = {};
-        if (q) {
-            where.OR = [
-                { id: { contains: q } },
-                { name: { contains: q, mode: 'insensitive' } },
-                { email: { contains: q, mode: 'insensitive' } },
-                { phone: { contains: q } },
-            ];
-        }
-        if (from || to) where.createdAt = { gte: from, lte: to };
-
-        const orderBy =
-            parseSort(query?.sort, ['createdAt', 'updatedAt', 'name', 'id']) ||
-            [{ createdAt: 'desc' as const }];
-
-        const [items, total] = await Promise.all([
-            prisma.contact.findMany({ where, skip, take, orderBy }),
-            prisma.contact.count({ where }),
-        ]);
-        return { items, total, skip, take, orderBy };
+    app.get('/contacts', async () => {
+        return prisma.contact.findMany({ orderBy: { createdAt: 'desc' } });
     });
 
-    app.get('/contacts/:id', async (req) => {
-        const { id } = req.params as { id: string };
-        return prisma.contact.findUniqueOrThrow({ where: { id } });
-    });
-
+    /**
+     * POST /contacts
+     * Add a new contact
+     */
     app.post('/contacts', async (req, reply) => {
         const { id, name, email, phone } = req.body as {
-            id: string; name: string; email?: string | null; phone?: string | null;
+            id: string;
+            name: string;
+            email: string;
+            phone: string;
         };
-        const created = await prisma.contact.create({ data: { id, name, email: email ?? null, phone: phone ?? null } });
-        reply.code(201).send(created);
+        const created = await prisma.contact.create({
+            data: { id, name, email, phone },
+        });
+        return reply.code(201).send(created);
     });
 
-    app.patch('/contacts/:id', async (req) => {
+    /**
+     * PATCH /contacts/:id
+     * Update an existing contact
+     * Prisma will automatically update `updatedAt`
+     */
+    app.patch('/contacts/:id', async (req, reply) => {
         const { id } = req.params as { id: string };
-        const { name, email, phone } = req.body as Partial<{ name: string; email: string | null; phone: string | null }>;
-        return prisma.contact.update({ where: { id }, data: { name, email, phone } });
+        const { name, email, phone } = req.body as Partial<{
+            name: string;
+            email: string;
+            phone: string;
+        }>;
+
+        try {
+            const updated = await prisma.contact.update({
+                where: { id },
+                data: {
+                    name: name ?? undefined,
+                    email: email ?? undefined,
+                    phone: phone ?? undefined,
+                },
+            });
+            return reply.send(updated);
+        } catch (e: any) {
+            if (e?.code === 'P2025') {
+                return reply.code(404).send({ message: 'Contact not found' });
+            }
+            throw e;
+        }
     });
 
+    /**
+     * DELETE /contacts/:id
+     * Remove a contact
+     */
     app.delete('/contacts/:id', async (req, reply) => {
         const { id } = req.params as { id: string };
-        await prisma.contact.delete({ where: { id } });
-        reply.code(204).send();
+        try {
+            await prisma.contact.delete({ where: { id } });
+            return reply.code(204).send();
+        } catch (e: any) {
+            if (e?.code === 'P2025') {
+                return reply.code(404).send({ message: 'Contact not found' });
+            }
+            throw e;
+        }
     });
 }

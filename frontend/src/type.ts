@@ -51,7 +51,6 @@ export interface Violation {
   snapshotUrl?: string;
   status: ViolationStatus;
   handler: string;
-  notices?: Notification[];
   bookmarkedBy?: UserViolationBookmark[];
 }
 

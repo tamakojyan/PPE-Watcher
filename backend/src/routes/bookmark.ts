@@ -76,10 +76,11 @@ export default async function bookmarkRoutes(app: FastifyInstance) {
             }
 
             // --- Sorting (default: newest first) ---
-            const orderBy: Prisma.UserViolationBookmarkOrderByWithRelationInput[] =
-                parseSort(q.sort, ['createdAt', 'violationId']) ?? [
-                    { violation: { ts: 'desc' } },
-                ];
+            const orderBy =
+                parseSort<Prisma.UserViolationBookmarkOrderByWithRelationInput>(
+                    (req.query as any)?.sort,
+                    ['createdAt']
+                ) || [{ createdAt: 'desc' }];
 
             app.log.info({ where, orderBy, skip, take }, '📌 Prisma query config');
 

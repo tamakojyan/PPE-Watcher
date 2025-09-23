@@ -20,6 +20,8 @@ import { useEffect, useState } from 'react';
 import ErrorIcon from '@mui/icons-material/Error';
 import { useTheme } from '@mui/material/styles';
 import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
+import ViolationDetailDialog from '../../../components/ViolationDetailDialog';
+
 import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
 import RemoveIcon from '@mui/icons-material/Remove';
 import VideocamIcon from '@mui/icons-material/Videocam';
@@ -99,7 +101,32 @@ export default function Dashboard(): React.ReactElement {
       });
   }, []);
 
+  // Add state inside the component
+  const [selected, setSelected] = useState<Violation | null>(null);
+  const [detailOpen, setDetailOpen] = useState(false);
+
+  // Callback when clicking the "Detail" button
+  function handleDetail(v: ViolationRow) {
+    // Re-fetch this violation to ensure the latest information
+    api.get<Violation>(`/violations/${v.id}`).then((res) => {
+      setSelected(res);
+      setDetailOpen(true);
+    });
+  }
+
+  // Handle "Resolve" action
+  async function handleResolve(id: string) {
+    await api.patch(`/violations/${id}`, { status: 'resolved' });
+    setDetailOpen(false);
+
+    // Refresh the list after resolving
+    api
+      .get<{ items: Violation[] }>('/violations', { sort: 'ts:desc' })
+      .then((res) => setVisibleRows(res.items.map(toRow)));
+  }
+
   if (loading) return <div>Loading…</div>;
+
   return (
     <Stack direction={'column'} sx={{ flex: 1, minHeight: 0 }}>
       <Grid
@@ -291,7 +318,11 @@ export default function Dashboard(): React.ReactElement {
                       )}
                     </TableCell>
                     <TableCell>
-                      <Button sx={{ maxWidth: 100 }} variant={'contained'}>
+                      <Button
+                        sx={{ maxWidth: 100 }}
+                        variant={'contained'}
+                        onClick={() => handleDetail(item)}
+                      >
                         Detail
                       </Button>
                     </TableCell>
@@ -305,6 +336,12 @@ export default function Dashboard(): React.ReactElement {
           </TableContainer>
         </CardContent>
       </Card>
+      <ViolationDetailDialog
+        open={detailOpen}
+        violation={selected}
+        onClose={() => setDetailOpen(false)}
+        onResolve={handleResolve}
+      />
     </Stack>
   );
 }

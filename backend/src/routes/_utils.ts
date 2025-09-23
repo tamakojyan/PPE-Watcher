@@ -24,23 +24,30 @@ export function toDate(v?: unknown) {
 }
 
 // "ts:desc,confidence:asc" -> Prisma orderBy[]
-export function parseSort(
+/**
+ * Parse sort string like "field:asc,other:desc" into Prisma orderBy input
+ * @param sort string from query
+ * @param allowed list of allowed fields
+ */
+export function parseSort<T>(
     sort: string | undefined,
     allowed: string[]
-): Prisma.UserViolationBookmarkOrderByWithRelationInput[] | undefined {
+): T[] | undefined {
     if (!sort) return undefined;
 
-    const [field, dir] = sort.split(':');
-    if (!allowed.includes(field)) return undefined;
+    const orders: T[] = [];
 
-    if (field.startsWith('violation.')) {
-        // nested sort
-        const nestedField = field.replace('violation.', '');
-        return [{ violation: { [nestedField]: dir === 'asc' ? 'asc' : 'desc' } }];
+    for (const token of sort.split(',')) {
+        const [field, dir] = token.split(':');
+        if (!field || !dir) continue;
+
+        if (!allowed.includes(field)) continue;
+        if (dir !== 'asc' && dir !== 'desc') continue;
+
+        orders.push({ [field]: dir } as unknown as T);
     }
 
-    // top-level sort
-    return [{ [field]: dir === 'asc' ? 'asc' : 'desc' } as any];
+    return orders.length > 0 ? orders : undefined;
 }
 
 // narrow string into union literal

@@ -35,6 +35,12 @@ model User {
   password  String
   createdAt DateTime @default(now())
 
+  // Timestamp of the last successful login
+  lastLoginAt DateTime?
+
+  // Timestamp of the last password change
+  lastPasswordChangeAt DateTime?
+
   // Relations
   violationBookmarks UserViolationBookmark[]
   notices            Notification[]          @relation("UserNotices") // Notifications received by the user
