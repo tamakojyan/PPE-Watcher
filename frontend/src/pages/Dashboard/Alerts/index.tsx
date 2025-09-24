@@ -12,25 +12,21 @@ import {
   TableFooter,
   Button,
   Paper,
-  Box,
-  Divider,
   Card,
   CardContent,
   TablePagination,
-  IconButton,
 } from '@mui/material';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import ErrorIcon from '@mui/icons-material/Error';
 import ListAltIcon from '@mui/icons-material/ListAlt';
 import { useEffect, useState } from 'react';
 import { useTheme } from '@mui/material';
-import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
-import FavoriteIcon from '@mui/icons-material/Favorite';
-import { pink } from '@mui/material/colors';
+
 import { Violation } from '@/type';
 import api from '../../../api/client';
 import { useBookmarksFromOutlet } from '../../../hooks/useBookmarksFromOutlet';
 import Bookmarkbutton from '../../../components/BookmarkButton';
+import ResolveButton from '../../../components/ResolveButton';
 
 export default function Alerts(): React.ReactElement {
   const { loading } = useBookmarksFromOutlet();
@@ -242,24 +238,33 @@ export default function Alerts(): React.ReactElement {
                           <TableCell>{selected?.handler ?? '-'}</TableCell>
                           <TableCell>
                             {selected?.status === 'open' ? (
-                              <Button
-                                variant="contained"
-                                sx={{
-                                  maxWidth: 100,
-                                  bgcolor:
-                                    theme.palette.mode === 'light'
-                                      ? theme.palette.error.main
-                                      : '#5f0e06',
+                              <ResolveButton
+                                violationId={selected.id}
+                                status={selected.status}
+                                onResolved={(updated) => {
+                                  if (!updated) return;
+
+                                  setSelected({
+                                    ...selected,
+                                    status: updated.status,
+                                    handler: updated.handler,
+                                  });
+
+                                  setVisibleRows((rows) =>
+                                    rows.map((r) =>
+                                      r.id === updated.id
+                                        ? { ...r, status: updated.status, handler: updated.handler }
+                                        : r
+                                    )
+                                  );
                                 }}
-                              >
-                                Resolve
-                              </Button>
+                              />
                             ) : (
                               <Button
                                 variant="contained"
                                 disabled
-                                sx={{ maxWidth: 100 }}
                                 color="success"
+                                sx={{ maxWidth: 100 }}
                               >
                                 Resolved
                               </Button>

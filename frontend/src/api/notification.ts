@@ -8,8 +8,7 @@ export async function updateNotificationStatus(
   id: string,
   status: NotificationStatus,
   note?: string
-): Promise<{ id: string; status: NotificationStatus; note?: string }> {
-  // Backend: PATCH /notifications/:id  { status, note }
+): Promise<{ id: string; status: NotificationStatus; note?: string; user?: { username: string } }> {
   const res = await api.patch(`/notifications/${id}`, { status, note });
-  return res as any; // adapt to your api.client return shape if needed
+  return res as any;
 }

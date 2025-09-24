@@ -1,69 +1,112 @@
 // src/components/ViolationDetailDialog.tsx
+import * as React from 'react';
 import {
   Dialog,
   DialogTitle,
   DialogContent,
   DialogActions,
   Button,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableRow,
+  TableContainer,
   Typography,
-  Stack,
-  Divider,
 } from '@mui/material';
 import { Violation } from '@/type';
+import ResolveButton from './ResolveButton';
+import BookmarkButton from './BookmarkButton';
 
 type Props = {
   open: boolean;
   violation: Violation | null;
   onClose: () => void;
-  onResolve?: (id: string) => void;
+  onResolve?: (id: string) => void | Promise<void>;
+  onUnbookmark?: (id: string) => void; //
 };
 
-export default function ViolationDetailDialog({ open, violation, onClose, onResolve }: Props) {
-  if (!violation) return null;
+export default function ViolationDetailDialog({
+  open,
+  violation,
+  onClose,
+  onResolve,
+  onUnbookmark,
+}: Props): React.ReactElement {
+  if (!violation) return <></>;
 
   return (
-    <Dialog open={open} onClose={onClose} maxWidth="md" fullWidth>
+    <Dialog open={open} onClose={onClose} maxWidth="lg" fullWidth>
       <DialogTitle>Violation Detail</DialogTitle>
-      <DialogContent dividers>
-        <Stack spacing={2}>
-          <Typography>
-            <strong>ID:</strong> {violation.id}
-          </Typography>
-          <Typography>
-            <strong>Types:</strong> {(violation.kinds ?? []).map((k) => k.type).join(', ')}
-          </Typography>
-          <Typography>
-            <strong>Status:</strong> {violation.status}
-          </Typography>
-          <Typography>
-            <strong>Timestamp:</strong> {new Date(violation.ts).toLocaleString()}
-          </Typography>
-          {violation.handler && (
-            <Typography>
-              <strong>Handler:</strong> {violation.handler}
-            </Typography>
+      <DialogContent>
+        {/* Image preview */}
+        <div style={{ textAlign: 'center', marginBottom: '1rem' }}>
+          {violation.snapshotUrl ? (
+            <img
+              src={violation.snapshotUrl}
+              alt="Violation snapshot"
+              style={{
+                maxWidth: '100%',
+                maxHeight: '400px',
+                objectFit: 'contain',
+              }}
+            />
+          ) : (
+            <Typography>No snapshot available</Typography>
           )}
-          {violation.snapshotUrl && (
-            <>
-              <Divider />
-              <img
-                src={violation.snapshotUrl}
-                alt="snapshot"
-                style={{ maxWidth: '100%', borderRadius: 8 }}
-              />
-            </>
-          )}
-        </Stack>
+        </div>
+
+        {/* Details table */}
+        <TableContainer>
+          <Table>
+            <TableHead>
+              <TableRow>
+                <TableCell>ID</TableCell>
+                <TableCell>Type</TableCell>
+                <TableCell>Time</TableCell>
+                <TableCell>Status</TableCell>
+                <TableCell>Handler</TableCell>
+                <TableCell>Action</TableCell>
+                <TableCell>Bookmark</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              <TableRow>
+                <TableCell>{violation.id}</TableCell>
+                <TableCell>{(violation.kinds ?? []).map((k) => k.type).join(', ')}</TableCell>
+                <TableCell>{violation.ts}</TableCell>
+                <TableCell>{violation.status}</TableCell>
+                <TableCell>{violation.handler ?? '-'}</TableCell>
+
+                {/* Reusable ResolveButton */}
+                <TableCell>
+                  <ResolveButton
+                    violationId={violation.id}
+                    status={violation.status}
+                    onResolved={onResolve}
+                  />
+                </TableCell>
+
+                {/* Bookmark button, trigger onUnbookmark when unbookmarked */}
+                <TableCell>
+                  <BookmarkButton
+                    violationId={violation.id}
+                    onChange={() => {
+                      if (onUnbookmark) {
+                        onUnbookmark(violation.id);
+                        onClose();
+                      }
+                    }}
+                  />
+                </TableCell>
+              </TableRow>
+            </TableBody>
+          </Table>
+        </TableContainer>
       </DialogContent>
+
       <DialogActions>
-        {violation.status === 'open' && (
-          <Button onClick={() => onResolve?.(violation.id)} variant="contained" color="error">
-            Resolve
-          </Button>
-        )}
-        <Button onClick={onClose} variant="outlined">
-          Close
-        </Button>
+        <Button onClick={onClose}>Close</Button>
       </DialogActions>
     </Dialog>
   );

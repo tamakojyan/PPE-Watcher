@@ -1,3 +1,4 @@
+// src/types/fastify.d.ts
 import { FastifyRequest, FastifyReply } from 'fastify';
 
 declare module 'fastify' {
@@ -5,3 +6,5 @@ declare module 'fastify' {
         authenticate: (req: FastifyRequest, reply: FastifyReply) => Promise<void>;
     }
 }
+
+export {};

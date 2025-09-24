@@ -29,15 +29,23 @@ import EventIcon from '@mui/icons-material/Event';
 import api from '../../../api/client';
 import { Violation } from '@/type';
 import { useBookmarksFromOutlet } from '../../../hooks/useBookmarksFromOutlet';
+import ResolveButton from '../../../components/ResolveButton';
+
 import Bookmarkbutton from '../../../components/BookmarkButton';
 export default function Dashboard(): React.ReactElement {
   const { loading } = useBookmarksFromOutlet();
-  type Stats = { open: number; resolved: number; all: number };
+  type Stats = { open: number; resolved: number; all: number; today: number; trend: number };
   const [stats, setStats] = useState<Stats | null>(null);
 
   useEffect(() => {
     api
-      .get<{ open: number; resolved: number; all: number }>('/violations/stats/status')
+      .get<{
+        open: number;
+        resolved: number;
+        all: number;
+        today: number;
+        trend: number;
+      }>('/violations/stats/status')
       .then((res) => {
         setStats(res);
       });
@@ -114,9 +122,8 @@ export default function Dashboard(): React.ReactElement {
     });
   }
 
-  // Handle "Resolve" action
+  // Handle "Resolve" action - only refresh UI, API call already done inside ResolveButton
   async function handleResolve(id: string) {
-    await api.patch(`/violations/${id}`, { status: 'resolved' });
     setDetailOpen(false);
 
     // Refresh the list after resolving
@@ -124,7 +131,6 @@ export default function Dashboard(): React.ReactElement {
       .get<{ items: Violation[] }>('/violations', { sort: 'ts:desc' })
       .then((res) => setVisibleRows(res.items.map(toRow)));
   }
-
   if (loading) return <div>Loading…</div>;
 
   return (
@@ -184,7 +190,7 @@ export default function Dashboard(): React.ReactElement {
                 <CardHeader
                   title={
                     <Typography variant={'h6'}>
-                      Trend{' '}
+                      Trend
                       <span style={{ color: 'grey', fontSize: '0.9rem' }}>
                         Relative to yesterday
                       </span>
@@ -197,13 +203,32 @@ export default function Dashboard(): React.ReactElement {
                 <Divider />
                 <CardContent>
                   <Grid container spacing={4}>
+                    {/* Left side: show absolute value of trend */}
                     <Grid size={6}>
-                      <Typography variant={'h4'} align={'center'}>
-                        {openCount}
+                      <Typography variant="h4" align="center">
+                        {Math.abs(stats?.trend ?? 0)}
                       </Typography>
                     </Grid>
-                    <Grid size={6}>
-                      <ArrowUpwardIcon fontSize={'large'} color={'error'} />
+
+                    {/* Right side: arrow indicates increase or decrease */}
+                    <Grid
+                      size={6}
+                      sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}
+                    >
+                      {/* Up arrow for positive trend */}
+                      {stats?.trend && stats.trend > 0 && (
+                        <ArrowUpwardIcon fontSize="large" color="error" />
+                      )}
+
+                      {/* Down arrow for negative trend */}
+                      {stats?.trend && stats.trend < 0 && (
+                        <ArrowDownwardIcon fontSize="large" color="success" />
+                      )}
+
+                      {/* Neutral dash if zero */}
+                      {(!stats?.trend || stats.trend === 0) && (
+                        <Typography color="text.secondary">–</Typography>
+                      )}
                     </Grid>
                   </Grid>
                 </CardContent>
@@ -222,7 +247,7 @@ export default function Dashboard(): React.ReactElement {
                   <Grid container spacing={4}>
                     <Grid size={6}>
                       <Typography variant={'h4'} align={'center'}>
-                        {openCount}
+                        {stats?.today ?? 0}
                       </Typography>
                     </Grid>
                     <Grid size={6}>
@@ -245,7 +270,7 @@ export default function Dashboard(): React.ReactElement {
                   <Grid container spacing={4}>
                     <Grid size={6}>
                       <Typography variant={'h4'} align={'center'}>
-                        1/{openCount}
+                        1/1
                       </Typography>
                     </Grid>
                     <Grid size={6}>
@@ -295,27 +320,17 @@ export default function Dashboard(): React.ReactElement {
                     <TableCell>{item.timestampText}</TableCell>
                     <TableCell>{item.handler}</TableCell>
                     <TableCell>
-                      {item.status === 'open' ? (
-                        <Button
-                          variant={'contained'}
-                          sx={{
-                            maxWidth: 100,
-                            bgcolor:
-                              theme.palette.mode === 'light' ? theme.palette.error.main : '#5f0e06',
-                          }}
-                        >
-                          Resolve
-                        </Button>
-                      ) : (
-                        <Button
-                          variant={'contained'}
-                          disabled
-                          sx={{ maxWidth: 100 }}
-                          color={'success'}
-                        >
-                          Resolved
-                        </Button>
-                      )}
+                      {/* Use the reusable ResolveButton component */}
+                      <ResolveButton
+                        violationId={item.id}
+                        status={item.status}
+                        onResolved={() => {
+                          // Refresh table after resolving
+                          api
+                            .get<{ items: Violation[] }>('/violations', { sort: 'ts:desc' })
+                            .then((res) => setVisibleRows(res.items.map(toRow)));
+                        }}
+                      />
                     </TableCell>
                     <TableCell>
                       <Button

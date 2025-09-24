@@ -26,6 +26,7 @@ import { Violation } from '@/type';
 import api from '../../../api/client';
 import { useBookmarksFromOutlet } from '../../../hooks/useBookmarksFromOutlet';
 import Bookmarkbutton from '../../../components/BookmarkButton';
+import ResolveButton from '../../../components/ResolveButton';
 
 export default function SearchViolations(): React.ReactElement {
   const { loading } = useBookmarksFromOutlet();
@@ -276,29 +277,29 @@ export default function SearchViolations(): React.ReactElement {
                             <TableCell>{selected?.status}</TableCell>
                             <TableCell>{selected?.handler}</TableCell>
                             <TableCell>
-                              {selected?.status === 'open' ? (
-                                <Button
-                                  variant={'contained'}
-                                  sx={{
-                                    maxWidth: 100,
-                                    bgcolor:
-                                      theme.palette.mode === 'light'
-                                        ? theme.palette.error.main
-                                        : '#5f0e06',
-                                  }}
-                                >
-                                  Resolve
-                                </Button>
-                              ) : (
-                                <Button
-                                  variant={'contained'}
-                                  disabled
-                                  sx={{ maxWidth: 100 }}
-                                  color={'success'}
-                                >
-                                  Resolved
-                                </Button>
-                              )}
+                              <ResolveButton
+                                violationId={selected.id}
+                                status={selected.status}
+                                onResolved={() => {
+                                  // Resolve 成功后，刷新列表
+                                  api
+                                    .get<{
+                                      items: Violation[];
+                                      total: number;
+                                      skip: number;
+                                      take: number;
+                                    }>('/violations', {
+                                      page,
+                                      pageSize: rowsPerPage,
+                                      sort: 'ts:desc',
+                                    })
+                                    .then((res) => {
+                                      setVisibleRows(res.items.map(toRow));
+                                      setTotal(res.total);
+                                      setSelected(null); // 关闭详情
+                                    });
+                                }}
+                              />
                             </TableCell>
                             <TableCell>
                               <Bookmarkbutton violationId={selected?.id} />

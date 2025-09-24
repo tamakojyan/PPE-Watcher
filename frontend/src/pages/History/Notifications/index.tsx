@@ -1,9 +1,7 @@
 import * as react from 'react';
 import {
   Grid,
-  Stack,
   Button,
-  TextField,
   Table,
   TableBody,
   TableHead,
@@ -11,26 +9,15 @@ import {
   TablePagination,
   TableCell,
   TableRow,
-  TableFooter,
-  TableSortLabel,
   Typography,
   Card,
   CardContent,
   CardHeader,
   Divider,
-  inputAdornmentClasses,
   useTheme,
 } from '@mui/material';
 
-import SearchIcon from '@mui/icons-material/Search';
-import InputAdornment from '@mui/material/InputAdornment';
-import IconButton from '@mui/material/IconButton';
-import ClearIcon from '@mui/icons-material/Clear';
-import { mockNotifications } from 'mock/notification';
 import { useEffect, useState } from 'react';
-import FavoriteIcon from '@mui/icons-material/Favorite';
-import { pink } from '@mui/material/colors';
-import { Violation } from '@/type';
 import api from '../../../api/client';
 import HandleNoteAction from '../../../components/HandleNoteAction';
 import DateRangePicker from '../../../components/DateRangePicker';
@@ -60,6 +47,7 @@ export default function Notifications(): React.ReactElement {
     readAtText?: string; // human-readable readAt (if any)
     violationId?: string | null; // linked violation id (optional)
     userId?: string | null; // owner/user id (optional)
+    handler?: string | null;
     message?: string | null; // message text (optional)
     note?: string | null; // extra note (optional)
   };
@@ -87,6 +75,7 @@ export default function Notifications(): React.ReactElement {
       readAtText: formatTs(n.readAt),
       violationId: n.violationId ?? null,
       userId: n.userId ?? null,
+      handler: n.user?.username ?? n.userId ?? '-',
       message: n.message ?? null,
       note: n.note ?? null,
     };
@@ -171,7 +160,7 @@ export default function Notifications(): React.ReactElement {
                     <TableCell>Time</TableCell>
                     <TableCell>ViolationID</TableCell>
                     <TableCell>Type</TableCell>
-
+                    <TableCell>Handler</TableCell>
                     <TableCell>Kind</TableCell>
                     <TableCell>Status</TableCell>
                   </TableRow>
@@ -185,6 +174,7 @@ export default function Notifications(): React.ReactElement {
                         <TableCell>{item.createdAtText}</TableCell>
                         <TableCell>{item.violationId}</TableCell>
                         <TableCell>{item.type}</TableCell>
+                        <TableCell>{item.handler}</TableCell>
                         <TableCell>{item.kind}</TableCell>
                         <TableCell>{item.status}</TableCell>
                         <TableCell>
@@ -196,7 +186,7 @@ export default function Notifications(): React.ReactElement {
                         </TableCell>
                       </TableRow>
                       <TableRow>
-                        <TableCell colSpan={6}>Note: {item.note ?? 'No note yet'}</TableCell>
+                        <TableCell colSpan={8}>Note: {item.note ?? 'No note yet'}</TableCell>
                       </TableRow>
                     </>
                   ))}

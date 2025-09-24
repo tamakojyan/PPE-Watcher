@@ -82,7 +82,7 @@ export default async function notificationRoutes(app: FastifyInstance) {
                 skip,
                 take,
                 orderBy,
-                include: { violation: true },
+                include: { violation: true, user: true },
             }),
             prisma.notification.count({ where }),
         ]);
@@ -111,26 +111,33 @@ export default async function notificationRoutes(app: FastifyInstance) {
         return { updated: r.count };
     });
 // PATCH /notifications/:id  -> update status/note
-    app.patch('/notifications/:id', async (req, reply) => {
+    app.patch('/notifications/:id', { preValidation: [app.authenticate] }, async (req, reply) => {
         const { id } = req.params as { id: string };
         const { status, note } = req.body as { status?: 'handled' | 'unhandled'; note?: string };
 
-        // Basic guard
         if (!status && note === undefined) {
             return reply.code(400).send({ message: 'Nothing to update' });
         }
 
+        const user = (req as any).user;
+        const userId = user?.id ?? null;
+
         const data: any = {};
         if (status) {
             data.status = status;
-            if (status === 'handled') data.readAt = new Date();
-            else data.readAt = null;
+            if (status === 'handled') {
+                data.readAt = new Date();
+            } else {
+                data.readAt = null;
+            }
         }
         if (note !== undefined) data.note = note;
+        if (userId) data.userId = userId; //
 
         const updated = await prisma.notification.update({
             where: { id },
             data,
+            include: { user: true }, //
         });
 
         return updated;

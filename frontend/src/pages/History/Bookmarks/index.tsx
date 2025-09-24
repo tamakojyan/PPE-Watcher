@@ -206,7 +206,14 @@ export default function Bookmarks(): React.ReactElement {
                         </Button>
                       </TableCell>
                       <TableCell>
-                        <Bookmarkbutton violationId={row.id} />
+                        {/* ✅ Only here: remove row immediately after unbookmark */}
+                        <Bookmarkbutton
+                          violationId={row.id}
+                          onChange={() => {
+                            setBookmarkRows((prev) => prev.filter((r) => r.id !== row.id));
+                            setTotal((prev) => prev - 1);
+                          }}
+                        />
                       </TableCell>
                     </TableRow>
                   ))}
@@ -231,6 +238,10 @@ export default function Bookmarks(): React.ReactElement {
         open={!!selectedViolation}
         violation={selectedViolation}
         onClose={() => setSelectedViolation(null)}
+        onUnbookmark={(id) => {
+          setBookmarkRows((prev) => prev.filter((r) => r.id !== id));
+          setTotal((prev) => prev - 1);
+        }}
       />
     </Grid>
   );

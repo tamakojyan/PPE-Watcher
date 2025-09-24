@@ -26,6 +26,7 @@ export default function SenderConfig(): React.ReactElement {
   const [smsProvider, setSmsProvider] = useState('');
   const [smsSid, setSmsSid] = useState('');
   const [smsToken, setSmsToken] = useState('');
+  const [smsFrom, setSmsFrom] = useState(''); // ✅ new field for sender number
 
   const [loading, setLoading] = useState(false);
 
@@ -39,6 +40,7 @@ export default function SenderConfig(): React.ReactElement {
       setSmsProvider(data.sms_provider || '');
       setSmsSid(data.sms_sid || '');
       setSmsToken(data.sms_token || '');
+      setSmsFrom(data.sms_from || '');
     });
   }, []);
 
@@ -69,6 +71,7 @@ export default function SenderConfig(): React.ReactElement {
         sms_provider: smsProvider,
         sms_sid: smsSid,
         sms_token: smsToken,
+        sms_from: smsFrom,
       });
       alert('SMS settings updated successfully!');
     } catch (err) {
@@ -85,7 +88,7 @@ export default function SenderConfig(): React.ReactElement {
         <CardHeader title={'SenderConfig Settings'} />
         <Divider />
         <CardContent>
-          {/* Email config */}
+          {/* ===================== Email config ===================== */}
           <Box component={'form'}>
             <Grid container spacing={2} direction={'column'} alignItems={'center'}>
               <Grid size={{ xs: 12, md: 6 }}>
@@ -99,6 +102,9 @@ export default function SenderConfig(): React.ReactElement {
                   placeholder={'smtp.example.com'}
                   fullWidth
                 />
+                <Typography variant="caption" color="text.secondary">
+                  example: smtp.sendgrid.net
+                </Typography>
               </Grid>
               <Grid size={{ xs: 12, md: 6 }}>
                 <TextField
@@ -108,6 +114,9 @@ export default function SenderConfig(): React.ReactElement {
                   placeholder={'465'}
                   fullWidth
                 />
+                <Typography variant="caption" color="text.secondary">
+                  example: 465 (SSL) or 587 (TLS)
+                </Typography>
               </Grid>
               <Grid size={{ xs: 12, md: 6 }}>
                 <TextField
@@ -117,6 +126,9 @@ export default function SenderConfig(): React.ReactElement {
                   placeholder={'user@example.com'}
                   fullWidth
                 />
+                <Typography variant="caption" color="text.secondary">
+                  example: no-reply@yourdomain.com
+                </Typography>
               </Grid>
               <Grid size={{ xs: 12, md: 6 }}>
                 <TextField
@@ -127,6 +139,9 @@ export default function SenderConfig(): React.ReactElement {
                   placeholder={'********'}
                   fullWidth
                 />
+                <Typography variant="caption" color="text.secondary">
+                  example: API key or SMTP password
+                </Typography>
               </Grid>
               <Grid
                 size={{ xs: 12, md: 6 }}
@@ -141,7 +156,7 @@ export default function SenderConfig(): React.ReactElement {
 
           <Divider sx={{ my: 3 }} />
 
-          {/* SMS config */}
+          {/* ===================== SMS config ===================== */}
           <Box component={'form'}>
             <Grid container spacing={2} direction={'column'} alignItems={'center'}>
               <Grid size={{ xs: 12, md: 6 }}>
@@ -155,6 +170,9 @@ export default function SenderConfig(): React.ReactElement {
                   placeholder={'twilio'}
                   fullWidth
                 />
+                <Typography variant="caption" color="text.secondary">
+                  example: twilio
+                </Typography>
               </Grid>
               <Grid size={{ xs: 12, md: 6 }}>
                 <TextField
@@ -164,6 +182,9 @@ export default function SenderConfig(): React.ReactElement {
                   placeholder={'ACxxxx'}
                   fullWidth
                 />
+                <Typography variant="caption" color="text.secondary">
+                  example: ACXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                </Typography>
               </Grid>
               <Grid size={{ xs: 12, md: 6 }}>
                 <TextField
@@ -173,6 +194,22 @@ export default function SenderConfig(): React.ReactElement {
                   placeholder={'xxxxxx'}
                   fullWidth
                 />
+                <Typography variant="caption" color="text.secondary">
+                  example: your_auth_token
+                </Typography>
+              </Grid>
+              {/*  New field: From Number */}
+              <Grid size={{ xs: 12, md: 6 }}>
+                <TextField
+                  label={'From Number'}
+                  value={smsFrom}
+                  onChange={(e) => setSmsFrom(e.target.value)}
+                  placeholder={'+1234567890'}
+                  fullWidth
+                />
+                <Typography variant="caption" color="text.secondary">
+                  example: +15005550006 (Twilio phone number)
+                </Typography>
               </Grid>
               <Grid
                 size={{ xs: 12, md: 6 }}
