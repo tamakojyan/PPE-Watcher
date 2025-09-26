@@ -189,7 +189,7 @@ export default function Trends(): React.ReactElement {
         <Grid
           container
           size={{ xs: 12 }}
-          sx={{ borderTop: '1px solid', borderBottom: '1px solid' }}
+          sx={{ borderTop: '1px solid', borderBottom: '1px solid', mb: 2 }}
         >
           <Grid size={{ xs: 6, md: 10 }}>
             <Stack direction="row" spacing={2} sx={{ mb: 2 }}>
@@ -207,10 +207,6 @@ export default function Trends(): React.ReactElement {
               </Button>
             </Stack>
           </Grid>
-          <Grid size={{ xs: 6, md: 2 }}>
-            <Button>Generate</Button>
-            <Button>Export</Button>
-          </Grid>
         </Grid>
         <Grid size={{ xs: 12 }}>
           <Grid container spacing={2}>
@@ -221,7 +217,6 @@ export default function Trends(): React.ReactElement {
       <Grid container size={{ xs: 12 }} sx={{ flex: 1, minHeight: 0 }}>
         <Grid size={{ xs: 12, md: 8 }} sx={{ borderRight: '1px solid' }}>
           <Box sx={{ flex: 1, minWidth: 0 }}>
-            {/* 柱状图（堆叠：open/resolved） */}
             <Box sx={{ height: '700px', pt: '150px' }}>
               <ResponsiveContainer width="100%" height="100%">
                 {chartType === 'line' ? (

@@ -68,8 +68,8 @@ export default function Notifications(): React.ReactElement {
   function toNotificationRow(n: any): NotificationRow {
     return {
       id: n.id,
-      type: String(n.type ?? ''),
-      kind: n.kind ? String(n.kind) : undefined,
+      type: n.type, // notification type (e.g. "violation", "system")
+      kind: n.violation?.kinds?.map((k: any) => k.type).join(', ') ?? '-',
       status: String(n.status ?? ''),
       createdAtText: formatTs(n.createdAt),
       readAtText: formatTs(n.readAt),

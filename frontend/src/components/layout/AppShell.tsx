@@ -43,7 +43,9 @@ export default function AppShell(): React.ReactElement {
   }, []);
 
   React.useEffect(() => {
-    refreshBookmarks();
+    if (isAuthenticated()) {
+      refreshBookmarks();
+    }
   }, [refreshBookmarks]);
 
   // Check helper

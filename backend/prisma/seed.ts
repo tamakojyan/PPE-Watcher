@@ -44,6 +44,7 @@ async function main() {
         id: id('USR', i + 1),
         email: `user${pad(i + 1)}@example.com`,
         password: 'pass123',
+        username:`user${pad(i + 1)}`
     }));
     await prisma.user.createMany({ data: users });
 

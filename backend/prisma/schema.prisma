@@ -84,7 +84,6 @@ model ViolationKind {
 model Notification {
   id        String             @id // Manually assigned, e.g. "NTF001"
   type      NotificationType   @default(violation)
-  kind      ViolationType // Type of violation (e.g. no_helmet)
   status    NotificationStatus @default(unhandled)
   createdAt DateTime           @default(now())
   readAt    DateTime?

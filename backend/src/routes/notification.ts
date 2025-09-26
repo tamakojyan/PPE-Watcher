@@ -82,7 +82,7 @@ export default async function notificationRoutes(app: FastifyInstance) {
                 skip,
                 take,
                 orderBy,
-                include: { violation: true, user: true },
+                include: { violation: { include: { kinds: true } }, user: true },
             }),
             prisma.notification.count({ where }),
         ]);
@@ -137,7 +137,7 @@ export default async function notificationRoutes(app: FastifyInstance) {
         const updated = await prisma.notification.update({
             where: { id },
             data,
-            include: { user: true }, //
+            include: {violation: { include: { kinds: true } }, user: true }, //
         });
 
         return updated;

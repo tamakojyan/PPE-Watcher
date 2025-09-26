@@ -2,6 +2,7 @@
 import type { FastifyInstance } from 'fastify';
 import { prisma } from '@lib/prisma';
 import { Prisma } from '@prisma/client'
+import { sendEmail, sendSMS } from '@lib/notifier';
 import {
     getPagination,
     toDate,
@@ -149,15 +150,18 @@ export default async function violationRoutes(app: FastifyInstance) {
      * PATCH /api/violations/:id/resolve
      * Resolve a violation and set handler from authenticated user
      */
+    // PATCH /violations/:id/resolve
+    /**
+     * PATCH /violations/:id/resolve
+     * Mark violation as resolved + send notifications
+     */
     app.patch(
         '/violations/:id/resolve',
-        {
-            preValidation: [app.authenticate],
-        },
+        { preValidation: [app.authenticate] },
         async (req, reply) => {
             const { id } = req.params as { id: string };
 
-            // get JWT from userId
+            // get userId from JWT
             const user: any = (req as any).user;
             const userId = user?.id;
 
@@ -169,26 +173,43 @@ export default async function violationRoutes(app: FastifyInstance) {
                     where: { id: userId },
                     select: { username: true },
                 });
-                if (dbUser?.username) {
-                    handler = dbUser.username;
-                }
+                if (dbUser?.username) handler = dbUser.username;
             }
 
-            // update violation status + handler
+            // update violation status
             const updated = await prisma.violation.update({
                 where: { id },
                 data: { status: 'resolved', handler },
-                include: { kinds: true },
             });
+
+            // create a notification
+            const notif = await prisma.notification.create({
+                data: {
+                    id: `NTF_${Date.now()}`,
+                    type: 'resolved',
+                    status: 'unhandled',
+                    violationId: updated.id,
+                    message: `Violation resolved by ${handler}`,
+                    userId,
+                },
+            });
+
+            // send to all contacts
+            const contacts = await prisma.contact.findMany();
+            for (const c of contacts) {
+                if (c.email)
+                    await sendEmail(c.email, 'Violation Resolved', notif.message || '');
+                if (c.phone)
+                    await sendSMS(c.phone, notif.message || '');
+            }
 
             return updated;
         }
     );
 
     /**
-     * POST /api/violations
-     * Body: { id: string; confidence?: number; snapshotUrl?: string; status?: 'open'|'resolved'; kinds?: ViolationType[] }
-     * Note: kinds
+     * POST /violations
+     * Body: { id, confidence?, snapshotUrl?, status? }
      */
     app.post('/violations', async (req, reply) => {
         const body = req.body as {
@@ -196,25 +217,40 @@ export default async function violationRoutes(app: FastifyInstance) {
             confidence?: number | null;
             snapshotUrl?: string | null;
             status?: (typeof VIOLATION_STATUS)[number];
-            kinds?: (typeof VIOLATION_TYPES)[number][];
         };
 
+        // create violation
         const created = await prisma.violation.create({
             data: {
                 id: body.id,
                 confidence: body.confidence ?? null,
                 snapshotUrl: body.snapshotUrl ?? null,
                 status: body.status ?? 'open',
-                kinds:
-                    body.kinds && body.kinds.length
-                        ? {create: [...new Set(body.kinds)].map((k) => ({type: k}))}
-                        : undefined,
             },
-            include: {kinds: true},
         });
+
+        // create notification
+        const notif = await prisma.notification.create({
+            data: {
+                id: `NTF_${Date.now()}`,
+                type: 'violation',
+                status: 'unhandled',
+                violationId: created.id,
+                message: 'New violation detected',
+            },
+        });
+
+        // send to all contacts
+        const contacts = await prisma.contact.findMany();
+        for (const c of contacts) {
+            if (c.email)
+                await sendEmail(c.email, 'New Violation', notif.message || '');
+            if (c.phone)
+                await sendSMS(c.phone, notif.message || '');
+        }
+
         reply.code(201).send(created);
     });
-
     /**
      * PATCH /api/violations/:id
      * Body 可包含：confidence / snapshotUrl / status / kinds（若提供 kinds 则整组替换）
