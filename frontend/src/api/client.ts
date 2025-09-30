@@ -39,11 +39,11 @@ function toQuery(query?: Record<string, unknown>): string {
 }
 
 /** Resolve base URL across Vite / CRA / default */
-const DEFAULT_BASE =
+const host = window.location.hostname;
+const DEFAULT_BASE: any =
   (typeof import.meta !== 'undefined' && (import.meta as any).env?.VITE_API_BASE) ||
   (typeof process !== 'undefined' && process.env?.REACT_APP_API_BASE) ||
-  'http://localhost:3001';
-
+  `http://${host}:8080`;
 /**
  * Create a minimal client.
  * @param baseURL API base URL

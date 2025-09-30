@@ -2,14 +2,15 @@
 import * as React from 'react';
 import { Box, CssBaseline, Toolbar, useMediaQuery, useTheme } from '@mui/material';
 import { Outlet, Navigate, useLocation } from 'react-router-dom';
+import { useEffect } from 'react';
 import TopBar from './TopBar';
 import SideNav from './SideNav';
 import Footer from './Footer';
 import MobileMenu from './MobileMenu';
 import MainNav from './MainNav';
 import { isAuthenticated } from '../../api/auth'; // your auth util
-import { useState } from 'react';
 import { getMyBookmarkIds, addBookmark, removeBookmark } from '../../api/bookmark';
+export const RefreshContext = React.createContext<{ tick: number }>({ tick: 0 });
 
 export type BookmarkOutletContext = {
   bookmarkIds: Set<string>;
@@ -20,6 +21,31 @@ export type BookmarkOutletContext = {
 };
 
 export default function AppShell(): React.ReactElement {
+  const [tick, setTick] = React.useState(0);
+
+  useEffect(() => {
+    const host = window.location.hostname;
+    const evtSource = new EventSource(`http://${host}:8080/events`);
+
+    evtSource.onopen = () => {
+      console.log('✅ SSE connection opened');
+    };
+
+    evtSource.onmessage = (event) => {
+      console.log('📩 SSE message:', event.data);
+      setTick((t) => t + 1);
+    };
+
+    evtSource.onerror = (err) => {
+      console.error('❌ SSE error:', err);
+    };
+
+    return () => {
+      evtSource.close();
+      console.log('🔌 SSE connection closed');
+    };
+  }, []);
+
   const [mobileOpen, setMobileOpen] = React.useState(false);
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
@@ -91,49 +117,51 @@ export default function AppShell(): React.ReactElement {
   }
 
   return (
-    <Box sx={{ display: 'flex', minHeight: '100vh' }}>
-      <CssBaseline />
-      <TopBar onMenuClick={toggleDrawer} title="PPE Watcher" isMobile={isMobile} />
-      {isMobile || <MainNav isMobile={isMobile} />}
+    <RefreshContext.Provider value={{ tick }}>
+      <Box sx={{ display: 'flex', minHeight: '100vh' }}>
+        <CssBaseline />
+        <TopBar onMenuClick={toggleDrawer} title="PPE Watcher" isMobile={isMobile} />
+        {isMobile || <MainNav isMobile={isMobile} />}
 
-      {/* Main content area */}
-      <Box
-        component="main"
-        sx={{
-          flex: 1,
-          p: 2,
-          ml: { md: `${240}px` }, // adjust drawer width if needed
-          display: 'flex',
-          flexDirection: 'column',
-          zIndex: (t: any) => t.zIndex.appBar - 2,
-          overflow: 'hidden',
-        }}
-      >
-        {/* Placeholder for toolbar */}
-        {isMobile || <Toolbar />}
-        <Toolbar />
-        {isMobile || <SideNav isMobile={isMobile} />}
-
-        {/* Page content */}
+        {/* Main content area */}
         <Box
+          component="main"
           sx={{
             flex: 1,
-            minHeight: 0,
+            p: 2,
+            ml: { md: `${240}px` }, // adjust drawer width if needed
             display: 'flex',
             flexDirection: 'column',
-            bgcolor:
-              theme.palette.mode === 'dark' ? theme.palette.grey[900] : theme.palette.grey[100],
+            zIndex: (t: any) => t.zIndex.appBar - 2,
+            overflow: 'hidden',
           }}
         >
-          <Outlet context={outletCtx} />
+          {/* Placeholder for toolbar */}
+          {isMobile || <Toolbar />}
+          <Toolbar />
+          {isMobile || <SideNav isMobile={isMobile} />}
+
+          {/* Page content */}
+          <Box
+            sx={{
+              flex: 1,
+              minHeight: 0,
+              display: 'flex',
+              flexDirection: 'column',
+              bgcolor:
+                theme.palette.mode === 'dark' ? theme.palette.grey[900] : theme.palette.grey[100],
+            }}
+          >
+            <Outlet context={outletCtx} />
+          </Box>
+
+          {/* Footer */}
+          <Footer Company="SafeVision Inc." Version="1.0" />
         </Box>
 
-        {/* Footer */}
-        <Footer Company="SafeVision Inc." Version="1.0" />
+        {/* Mobile menu */}
+        <MobileMenu open={mobileOpen} onClose={closeDrawer} title="PPE Watcher" />
       </Box>
-
-      {/* Mobile menu */}
-      <MobileMenu open={mobileOpen} onClose={closeDrawer} title="PPE Watcher" />
-    </Box>
+    </RefreshContext.Provider>
   );
 }

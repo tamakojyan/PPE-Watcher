@@ -1,4 +1,3 @@
-import * as react from 'react';
 import {
   Grid,
   Button,
@@ -14,14 +13,15 @@ import {
   CardContent,
   CardHeader,
   Divider,
-  useTheme,
 } from '@mui/material';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useContext } from 'react';
 import api from '../../../api/client';
 import HandleNoteAction from '../../../components/HandleNoteAction';
 import DateRangePicker from '../../../components/DateRangePicker';
 import KeywordSearch from '../../../components/KeywordSearch';
+import { RefreshContext } from '../../../components/layout/AppShell';
+
 export default function Notifications(): React.ReactElement {
   const [filters, setFilters] = useState<{ from?: number; to?: number; keyword?: string }>({});
 
@@ -81,6 +81,7 @@ export default function Notifications(): React.ReactElement {
     };
   }
   const [visibleRows, setVisibleRows] = useState<NotificationRow[]>([]);
+  const { tick } = useContext(RefreshContext);
 
   useEffect(() => {
     const params: any = {
@@ -105,14 +106,8 @@ export default function Notifications(): React.ReactElement {
         setTotal(res.total);
         console.log(res);
       });
-  }, [page, rowsPerPage, filters, refreshTick]);
+  }, [page, rowsPerPage, filters, refreshTick, tick]);
 
-  const [selected, setSelected] = useState<NotificationRow | null>(null);
-  const handleRowClick = (row: NotificationRow) => {
-    setSelected(row);
-  };
-
-  const theme = useTheme();
   return (
     <Grid
       container

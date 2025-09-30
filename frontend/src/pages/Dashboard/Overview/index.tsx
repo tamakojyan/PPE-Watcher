@@ -16,11 +16,12 @@ import {
   IconButton,
 } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useContext } from 'react';
 import ErrorIcon from '@mui/icons-material/Error';
 import { useTheme } from '@mui/material/styles';
 import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
 import ViolationDetailDialog from '../../../components/ViolationDetailDialog';
+import { RefreshContext } from '../../../components/layout/AppShell';
 
 import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
 import RemoveIcon from '@mui/icons-material/Remove';
@@ -33,6 +34,8 @@ import ResolveButton from '../../../components/ResolveButton';
 
 import Bookmarkbutton from '../../../components/BookmarkButton';
 export default function Dashboard(): React.ReactElement {
+  const { tick } = useContext(RefreshContext);
+
   const { loading } = useBookmarksFromOutlet();
   type Stats = { open: number; resolved: number; all: number; today: number; trend: number };
   const [stats, setStats] = useState<Stats | null>(null);
@@ -107,7 +110,7 @@ export default function Dashboard(): React.ReactElement {
         setVisibleRows(res.items.map(toRow));
         console.log(res.items);
       });
-  }, []);
+  }, [tick]);
 
   // Add state inside the component
   const [selected, setSelected] = useState<Violation | null>(null);

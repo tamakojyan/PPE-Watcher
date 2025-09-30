@@ -19,8 +19,8 @@ import {
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import ErrorIcon from '@mui/icons-material/Error';
 import ListAltIcon from '@mui/icons-material/ListAlt';
-import { useEffect, useState } from 'react';
-import { useTheme } from '@mui/material';
+import { useEffect, useState, useContext } from 'react';
+import { RefreshContext } from '../../../components/layout/AppShell';
 
 import { Violation } from '@/type';
 import api from '../../../api/client';
@@ -29,20 +29,11 @@ import Bookmarkbutton from '../../../components/BookmarkButton';
 import ResolveButton from '../../../components/ResolveButton';
 
 export default function Alerts(): React.ReactElement {
+  const { tick } = useContext(RefreshContext);
   const { loading } = useBookmarksFromOutlet();
   type Stats = { open: number; resolved: number; all: number };
   const [stats, setStats] = useState<Stats | null>(null);
 
-  useEffect(() => {
-    api
-      .get<{ open: number; resolved: number; all: number }>('/violations/stats/status')
-      .then((res) => {
-        setStats(res);
-      });
-  }, []);
-  console.log(stats);
-
-  const theme = useTheme();
   const openCount = stats?.open ?? 0;
   const resolvedCount = stats?.resolved;
   const totalCount = stats?.all;
@@ -99,6 +90,14 @@ export default function Alerts(): React.ReactElement {
     };
   }
   const [visibleRows, setVisibleRows] = useState<ViolationRow[]>([]);
+  useEffect(() => {
+    api
+      .get<{ open: number; resolved: number; all: number }>('/violations/stats/status')
+      .then((res) => {
+        setStats(res);
+      });
+  }, [visibleRows]);
+  console.log(stats);
 
   useEffect(() => {
     api
@@ -113,7 +112,7 @@ export default function Alerts(): React.ReactElement {
         setVisibleRows(res.items.map(toRow));
         setTotal(res.total);
       });
-  }, [page, rowsPerPage]);
+  }, [page, rowsPerPage, tick]);
 
   const [selected, setSelected] = useState<ViolationRow | null>(null);
   const handleRowClick = (row: ViolationRow) => {

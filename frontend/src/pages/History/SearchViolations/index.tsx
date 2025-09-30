@@ -16,21 +16,22 @@ import {
   CardHeader,
   Divider,
 } from '@mui/material';
-
+import TestViolationButton from '../../../components/TestViolationButton';
 import DateRangePicker from '../../../components/DateRangePicker';
 import KeywordSearch from '../../../components/KeywordSearch';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useContext } from 'react';
 import { useTheme } from '@mui/material';
 import { Violation } from '@/type';
 import api from '../../../api/client';
 import { useBookmarksFromOutlet } from '../../../hooks/useBookmarksFromOutlet';
 import Bookmarkbutton from '../../../components/BookmarkButton';
 import ResolveButton from '../../../components/ResolveButton';
+import { RefreshContext } from '../../../components/layout/AppShell';
 
 export default function SearchViolations(): React.ReactElement {
   const { loading } = useBookmarksFromOutlet();
-
+  const { tick } = useContext(RefreshContext);
   const theme = useTheme();
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState<number>(15);
@@ -111,7 +112,7 @@ export default function SearchViolations(): React.ReactElement {
         setVisibleRows(res.items.map(toRow));
         setTotal(res.total);
       });
-  }, [page, rowsPerPage, filters]);
+  }, [page, rowsPerPage, filters, tick]);
 
   const [selected, setSelected] = useState<ViolationRow | null>(null);
   const handleRowClick = (row: ViolationRow) => {
@@ -131,7 +132,7 @@ export default function SearchViolations(): React.ReactElement {
             <Typography variant={'h6'}>Search Violations</Typography>
           </Grid>
           <Grid size={{ xs: 3, md: 1 }}>
-            <Button> Export</Button>
+            <TestViolationButton />
           </Grid>
           <Grid size={{ xs: 3, md: 1 }}>
             <Button>Help</Button>

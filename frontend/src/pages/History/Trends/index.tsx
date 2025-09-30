@@ -1,18 +1,6 @@
 import * as react from 'react';
-import {
-  Chip,
-  Grid,
-  Stack,
-  Card,
-  CardHeader,
-  CardContent,
-  Typography,
-  Divider,
-  Button,
-  Box,
-} from '@mui/material';
+import { Chip, Grid, Stack, Typography, Divider, Button, Box } from '@mui/material';
 import { useTheme } from '@mui/material';
-import { mockViolations } from 'mock/violations';
 import {
   ResponsiveContainer,
   BarChart,
@@ -29,10 +17,11 @@ import {
   Cell,
 } from 'recharts';
 import { format, startOfDay } from 'date-fns';
-import { useEffect, useMemo, useState } from 'react';
+import { useContext, useEffect, useMemo, useState } from 'react';
 import { Violation } from '@/type';
 import api from '../../../api/client';
 import DateRangePicker from '../../../components/DateRangePicker';
+import { RefreshContext } from '../../../components/layout/AppShell';
 
 // ---- Types for chart buckets ----
 const allTypes = ['no_mask', 'no_helmet', 'no_vest', 'no_gloves'] as const;
@@ -47,39 +36,6 @@ type Bucket = {
 };
 
 // ---- Build UI row (optional, if your page still shows a table etc.) ----
-type ViolationRow = {
-  id: string;
-  typeText: string;
-  status: string;
-  timestampText: string;
-  imageUrl?: string | null;
-  confidence?: number;
-  handler?: string | null;
-};
-
-// Human readable date-time
-const dtf = new Intl.DateTimeFormat(undefined, {
-  dateStyle: 'medium',
-  timeStyle: 'short',
-});
-
-function formatTs(ts?: string): string {
-  if (!ts) return '';
-  const d = new Date(ts);
-  return Number.isNaN(+d) ? ts : dtf.format(d);
-}
-
-function toRow(v: Violation): ViolationRow {
-  return {
-    id: v.id,
-    typeText: (v.kinds ?? []).map((k) => k.type).join(', '),
-    status: v.status,
-    timestampText: formatTs(v.ts),
-    imageUrl: v.snapshotUrl ?? null,
-    confidence: v.confidence,
-    handler: v.handler ?? null,
-  };
-}
 
 // ---- Aggregate by day from RAW violations ----
 function groupByDay(list: Violation[]): Bucket[] {
@@ -115,6 +71,8 @@ function groupByDay(list: Violation[]): Bucket[] {
 }
 
 export default function Trends(): React.ReactElement {
+  const { tick } = useContext(RefreshContext);
+
   const [dateRange, setDateRange] = useState<{ from?: number; to?: number }>({});
 
   const theme = useTheme();
@@ -136,7 +94,7 @@ export default function Trends(): React.ReactElement {
       );
       setViolations(res.items);
     })();
-  }, [dateRange]);
+  }, [dateRange, tick]);
 
   // Aggregate buckets from RAW data
   const buckets = useMemo(() => groupByDay(violations), [violations]);

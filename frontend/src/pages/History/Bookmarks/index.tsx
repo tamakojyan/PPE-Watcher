@@ -17,7 +17,7 @@ import {
 } from '@mui/material';
 import { useTheme } from '@mui/material';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { getMyBookmarks } from '../../../api/bookmark';
 import { useBookmarksFromOutlet } from '../../../hooks/useBookmarksFromOutlet';
 import Bookmarkbutton from '../../../components/BookmarkButton';
@@ -25,7 +25,7 @@ import DateRangePicker from '../../../components/DateRangePicker';
 import KeywordSearch from '../../../components/KeywordSearch';
 import ViolationDetailDialog from '../../../components/ViolationDetailDialog';
 import { Violation, ViolationKind, ViolationType, ViolationStatus } from '@/type';
-
+import { RefreshContext } from '../../../components/layout/AppShell';
 export default function Bookmarks(): React.ReactElement {
   const { loading } = useBookmarksFromOutlet();
   const [filters, setFilters] = useState<{ from?: number; to?: number; keyword?: string }>({});

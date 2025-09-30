@@ -1,5 +1,6 @@
 import type { FastifyRequest } from 'fastify';
 import {Prisma} from '@prisma/client';
+import { format } from "date-fns";
 
 // pagination: support (?page=1&pageSize=20) or (?skip=0&take=20)
 export function getPagination(req: FastifyRequest) {
@@ -56,8 +57,19 @@ export function toEnum<T extends readonly string[]>(v: unknown, accepted: T): T[
     return (accepted as readonly string[]).includes(v) ? (v as T[number]) : undefined;
 }
 
+/**
+ * Generate a custom ID with business prefix + formatted timestamp
+ * @param prefix Business prefix like "VIO", "NTF", "USR"
+ * @returns string ID, e.g. VIO20250927223015
+ */
+export function generateId(prefix: string): string {
+    const ts = format(new Date(), "yyyyMMddHHmmss");
+    return `${prefix}${ts}`;
+}
+
 // literals aligned with schema enums
 export const VIOLATION_STATUS = ['open', 'resolved'] as const;
+export type ViolationType = typeof VIOLATION_TYPES[number]
 export const VIOLATION_TYPES  = ['no_helmet', 'no_mask', 'no_vest', 'no_gloves'] as const;
 export const NOTIF_STATUS = ['read', 'unread'] as const;
 export const NOTIF_TYPES  = ['violation', 'resolved'] as const;

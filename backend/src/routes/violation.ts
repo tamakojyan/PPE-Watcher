@@ -6,12 +6,15 @@ import { sendEmail, sendSMS } from '@lib/notifier';
 import {
     getPagination,
     toDate,
+    generateId,
     toEnum,
     parseSort,
     VIOLATION_STATUS,
     VIOLATION_TYPES,
+    ViolationType
 } from './_utils';
 import { startOfDay, subDays } from 'date-fns';
+import { broadcastEvent } from './events';
 
 
 export default async function violationRoutes(app: FastifyInstance) {
@@ -99,7 +102,6 @@ export default async function violationRoutes(app: FastifyInstance) {
             }),
             prisma.violation.count({where}),
         ]);
-
         return {items, total, skip, take, orderBy};
     });
 
@@ -185,7 +187,7 @@ export default async function violationRoutes(app: FastifyInstance) {
             // create a notification
             const notif = await prisma.notification.create({
                 data: {
-                    id: `NTF_${Date.now()}`,
+                    id: generateId("NTF"),
                     type: 'resolved',
                     status: 'unhandled',
                     violationId: updated.id,
@@ -202,7 +204,7 @@ export default async function violationRoutes(app: FastifyInstance) {
                 if (c.phone)
                     await sendSMS(c.phone, notif.message || '');
             }
-
+            broadcastEvent({ type: 'violation_resolved', id });
             return updated;
         }
     );
@@ -211,28 +213,38 @@ export default async function violationRoutes(app: FastifyInstance) {
      * POST /violations
      * Body: { id, confidence?, snapshotUrl?, status? }
      */
+    // POST /violations
     app.post('/violations', async (req, reply) => {
         const body = req.body as {
-            id: string;
             confidence?: number | null;
             snapshotUrl?: string | null;
-            status?: (typeof VIOLATION_STATUS)[number];
+            kinds: string[]; // 调用方传的数组，比如 ["no_mask","no_helmet"]
         };
 
-        // create violation
+        const newId = generateId("VIO");
+
+        // create violation + related kinds
         const created = await prisma.violation.create({
             data: {
-                id: body.id,
+                id: newId,
                 confidence: body.confidence ?? null,
                 snapshotUrl: body.snapshotUrl ?? null,
-                status: body.status ?? 'open',
+                status: 'open',
+                kinds: body.kinds?.length
+                    ? {
+                        create: body.kinds.map((k) => ({
+                            type: k as ViolationType, // Prisma 会自动关联 violationId
+                        })),
+                    }
+                    : undefined,
             },
+            include: { kinds: true },
         });
 
         // create notification
         const notif = await prisma.notification.create({
             data: {
-                id: `NTF_${Date.now()}`,
+                id: generateId("NTF"),
                 type: 'violation',
                 status: 'unhandled',
                 violationId: created.id,
@@ -243,14 +255,17 @@ export default async function violationRoutes(app: FastifyInstance) {
         // send to all contacts
         const contacts = await prisma.contact.findMany();
         for (const c of contacts) {
-            if (c.email)
-                await sendEmail(c.email, 'New Violation', notif.message || '');
-            if (c.phone)
-                await sendSMS(c.phone, notif.message || '');
+            if (c.email) await sendEmail(c.email, 'New Violation', notif.message || '');
+            if (c.phone) await sendSMS(c.phone, notif.message || '');
         }
 
         reply.code(201).send(created);
+        broadcastEvent({ type: 'violation_created', id: newId });
+        console.log('📢 Broadcast violation_created', created.id);
+
     });
+
+
     /**
      * PATCH /api/violations/:id
      * Body 可包含：confidence / snapshotUrl / status / kinds（若提供 kinds 则整组替换）
@@ -309,7 +324,6 @@ export default async function violationRoutes(app: FastifyInstance) {
         try {
             await prisma.userViolationBookmark.create({data: {userId, violationId}});
         } catch (e: any) {
-            // 复合主键重复（已收藏），可忽略
             if (e?.code !== 'P2002') throw e;
         }
         reply.code(201).send({ok: true});
@@ -317,7 +331,6 @@ export default async function violationRoutes(app: FastifyInstance) {
 
     /**
      * DELETE /api/violations/:id/bookmark?userId=USR001
-     * 无 token 版本：从 query 读取 userId（为了匹配你现有 client.del()）
      */
     app.delete('/violations/:id/bookmark', async (req, reply) => {
         const {id: violationId} = req.params as { id: string };
