@@ -5,3 +5,4 @@ backend/dist
 backend/dev.db
 backend/.env
 .DS_Store
+/frontend/src/mock/
