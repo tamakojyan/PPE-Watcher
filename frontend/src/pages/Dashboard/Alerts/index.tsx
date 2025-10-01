@@ -27,6 +27,7 @@ import api from '../../../api/client';
 import { useBookmarksFromOutlet } from '../../../hooks/useBookmarksFromOutlet';
 import Bookmarkbutton from '../../../components/BookmarkButton';
 import ResolveButton from '../../../components/ResolveButton';
+import ViolationDetailDialog from '../../../components/ViolationDetailDialog';
 
 export default function Alerts(): React.ReactElement {
   const { tick } = useContext(RefreshContext);
@@ -119,10 +120,24 @@ export default function Alerts(): React.ReactElement {
       });
   }, [page, rowsPerPage, tick]);
 
-  const [selected, setSelected] = useState<ViolationRow | null>(null);
-  const handleRowClick = (row: ViolationRow) => {
-    setSelected(row);
-  };
+  const [selected, setSelected] = useState<Violation | null>(null);
+  const [detailOpen, setDetailOpen] = useState(false);
+  async function handleResolve(id: string) {
+    setDetailOpen(false);
+
+    // Refresh the list after resolving
+    api
+      .get<{ items: Violation[] }>('/violations', { sort: 'ts:desc' })
+      .then((res) => setVisibleRows(res.items.map(toRow)));
+  }
+  function handleDetail(v: ViolationRow) {
+    // Re-fetch this violation to ensure the latest information
+    api.get<Violation>(`/violations/${v.id}`).then((res) => {
+      setSelected(res);
+      setDetailOpen(true);
+    });
+  }
+
   if (loading) return <div>Loading…</div>;
 
   return (
@@ -158,25 +173,53 @@ export default function Alerts(): React.ReactElement {
 
       <Grid size={{ xs: 12 }} sx={{ display: 'flex', flex: 1, minHeight: 0 }}>
         <Grid container sx={{ flex: 1, minHeight: 0 }}>
-          <Grid size={{ xs: 12, lg: 5 }} sx={{ minHeight: 0 }}>
+          <Grid size={{ xs: 12, lg: 12 }} sx={{ minHeight: 0 }}>
             <Paper>
               <TableContainer>
                 <Table stickyHeader>
                   <TableHead>
                     <TableRow>
                       <TableCell>Id</TableCell>
-                      <TableCell>Type</TableCell>
+                      <TableCell width={'500px'}>Type</TableCell>
                       <TableCell>Time</TableCell>
+                      <TableCell>Handler</TableCell>
                       <TableCell>Status</TableCell>
+                      <TableCell>Detail</TableCell>
+                      <TableCell>Bookmarks</TableCell>
                     </TableRow>
                   </TableHead>
                   <TableBody>
-                    {visibleRows.map((row) => (
-                      <TableRow key={row.id} hover onClick={() => handleRowClick(row)}>
-                        <TableCell>{row.id}</TableCell>
-                        <TableCell>{row.typeText}</TableCell>
-                        <TableCell>{row.timestampText}</TableCell>
-                        <TableCell>{row.status}</TableCell>
+                    {visibleRows.map((item) => (
+                      <TableRow key={item.id}>
+                        <TableCell>{item.id}</TableCell>
+                        <TableCell>{item.typeText}</TableCell>
+                        <TableCell>{item.timestampText}</TableCell>
+                        <TableCell>{item.handler}</TableCell>
+                        <TableCell>
+                          {/* Use the reusable ResolveButton component */}
+                          <ResolveButton
+                            violationId={item.id}
+                            status={item.status}
+                            onResolved={() => {
+                              // Refresh table after resolving
+                              api
+                                .get<{ items: Violation[] }>('/violations', { sort: 'ts:desc' })
+                                .then((res) => setVisibleRows(res.items.map(toRow)));
+                            }}
+                          />
+                        </TableCell>
+                        <TableCell>
+                          <Button
+                            sx={{ maxWidth: 100 }}
+                            variant={'contained'}
+                            onClick={() => handleDetail(item)}
+                          >
+                            Detail
+                          </Button>
+                        </TableCell>
+                        <TableCell>
+                          <Bookmarkbutton violationId={item.id} />
+                        </TableCell>
                       </TableRow>
                     ))}
                   </TableBody>
@@ -193,102 +236,14 @@ export default function Alerts(): React.ReactElement {
               />
             </Paper>
           </Grid>
-          <Grid size={{ xs: 12, lg: 7 }} sx={{ minHeight: 0 }}>
-            <Stack sx={{ height: '100%', minHeight: 0, display: 'flex' }}>
-              <Stack
-                sx={{
-                  flex: 10,
-                  borderBottom: '1px solid',
-                  borderColor: 'grey',
-                  overflow: 'hidden',
-                  minHeight: 0,
-                }}
-              >
-                {selected ? (
-                  <img
-                    src={selected?.imageUrl ?? ''} // ← use imageUrl, not snapshotUrl
-                    alt=""
-                    style={{
-                      minHeight: 0,
-                      maxWidth: '100%',
-                      maxHeight: '750px',
-                      objectFit: 'contain',
-                    }}
-                  />
-                ) : (
-                  <Typography> Click A row to preview</Typography>
-                )}
-              </Stack>
-              <Stack sx={{ flex: 2 }}>
-                {selected ? (
-                  <TableContainer>
-                    <Table stickyHeader>
-                      <TableHead>
-                        <TableRow>
-                          <TableCell>Id</TableCell>
-                          <TableCell width={'500px'}>Type</TableCell>
-                          <TableCell>Time</TableCell>
-                          <TableCell>Status</TableCell>
-                          <TableCell>Handler</TableCell>
-                          <TableCell>Action</TableCell>
-                        </TableRow>
-                      </TableHead>
-                      <TableBody>
-                        <TableRow>
-                          <TableCell>{selected?.id}</TableCell>
-                          <TableCell>{selected?.typeText}</TableCell>
-                          <TableCell>{selected?.timestampText}</TableCell>
-                          <TableCell>{selected?.status}</TableCell>
-                          <TableCell>{selected?.handler ?? '-'}</TableCell>
-                          <TableCell>
-                            {selected?.status === 'open' ? (
-                              <ResolveButton
-                                violationId={selected.id}
-                                status={selected.status}
-                                onResolved={(updated) => {
-                                  if (!updated) return;
-
-                                  setSelected({
-                                    ...selected,
-                                    status: updated.status,
-                                    handler: updated.handler,
-                                  });
-
-                                  setVisibleRows((rows) =>
-                                    rows.map((r) =>
-                                      r.id === updated.id
-                                        ? { ...r, status: updated.status, handler: updated.handler }
-                                        : r
-                                    )
-                                  );
-                                }}
-                              />
-                            ) : (
-                              <Button
-                                variant="contained"
-                                disabled
-                                color="success"
-                                sx={{ maxWidth: 100 }}
-                              >
-                                Resolved
-                              </Button>
-                            )}
-                          </TableCell>
-                          <TableCell>
-                            <Bookmarkbutton violationId={selected?.id} />
-                          </TableCell>
-                        </TableRow>
-                      </TableBody>
-                    </Table>
-                  </TableContainer>
-                ) : (
-                  <Typography> Click A row to preview</Typography>
-                )}
-              </Stack>
-            </Stack>
-          </Grid>
         </Grid>
       </Grid>
+      <ViolationDetailDialog
+        open={detailOpen}
+        violation={selected}
+        onClose={() => setDetailOpen(false)}
+        onResolve={handleResolve}
+      />
     </Grid>
   );
 }

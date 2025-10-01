@@ -20,7 +20,7 @@ import TestViolationButton from '../../../components/TestViolationButton';
 import DateRangePicker from '../../../components/DateRangePicker';
 import KeywordSearch from '../../../components/KeywordSearch';
 
-import { useEffect, useState, useContext } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import { useTheme } from '@mui/material';
 import { Violation } from '@/type';
 import api from '../../../api/client';
@@ -28,7 +28,7 @@ import { useBookmarksFromOutlet } from '../../../hooks/useBookmarksFromOutlet';
 import Bookmarkbutton from '../../../components/BookmarkButton';
 import ResolveButton from '../../../components/ResolveButton';
 import { RefreshContext } from '../../../components/layout/AppShell';
-
+import ViolationDetailDialog from '../../../components/ViolationDetailDialog';
 export default function SearchViolations(): React.ReactElement {
   const { loading } = useBookmarksFromOutlet();
   const { tick } = useContext(RefreshContext);
@@ -83,6 +83,17 @@ export default function SearchViolations(): React.ReactElement {
       handler: v.handler, // Pass through handler for UI usage
     };
   }
+  const [detailOpen, setDetailOpen] = useState(false);
+  const [selected, setSelected] = useState<Violation | null>(null);
+
+  function handleDetail(v: ViolationRow) {
+    // Re-fetch this violation to ensure the latest information
+    api.get<Violation>(`/violations/${v.id}`).then((res) => {
+      setSelected(res);
+      setDetailOpen(true);
+    });
+  }
+
   const [visibleRows, setVisibleRows] = useState<ViolationRow[]>([]);
 
   const [filters, setFilters] = useState<{ from?: number; to?: number; keyword?: string }>({});
@@ -117,11 +128,14 @@ export default function SearchViolations(): React.ReactElement {
         setTotal(res.total);
       });
   }, [page, rowsPerPage, filters, tick]);
+  async function handleResolve(id: string) {
+    setDetailOpen(false);
 
-  const [selected, setSelected] = useState<ViolationRow | null>(null);
-  const handleRowClick = (row: ViolationRow) => {
-    setSelected(row);
-  };
+    // Refresh the list after resolving
+    api
+      .get<{ items: Violation[] }>('/violations', { sort: 'ts:desc' })
+      .then((res) => setVisibleRows(res.items.map(toRow)));
+  }
   if (loading) return <div>Loading…</div>;
 
   return (
@@ -160,7 +174,7 @@ export default function SearchViolations(): React.ReactElement {
       </Grid>
       <Grid size={{ xs: 12 }} sx={{ flex: 1, minHeight: 0 }}>
         <Grid container sx={{ height: '100%', minHeight: 0 }} spacing={1}>
-          <Grid size={{ xs: 12, lg: 8 }}>
+          <Grid size={{ xs: 12, lg: 12 }}>
             <Card sx={{ height: { xs: 'auto', md: '100%' }, border: '1px solid' }}>
               <CardHeader
                 title={'List'}
@@ -181,25 +195,42 @@ export default function SearchViolations(): React.ReactElement {
                         <TableCell>Time</TableCell>
                         <TableCell>Handler</TableCell>
                         <TableCell>Status</TableCell>
+                        <TableCell>Detail</TableCell>
+                        <TableCell>Bookmarks</TableCell>
                       </TableRow>
                     </TableHead>
                     <TableBody>
-                      {visibleRows.map((row) => (
-                        <TableRow
-                          key={row.id}
-                          hover
-                          sx={{
-                            cursor: 'pointer',
-                            bgcolor:
-                              selected?.id === row.id ? theme.palette.action.selected : undefined,
-                          }}
-                          onClick={() => handleRowClick(row)}
-                        >
-                          <TableCell>{row.id}</TableCell>
-                          <TableCell>{row.typeText}</TableCell>
-                          <TableCell>{row.timestampText}</TableCell>
-                          <TableCell>{row.handler}</TableCell>
-                          <TableCell>{row.status}</TableCell>
+                      {visibleRows.map((item) => (
+                        <TableRow key={item.id}>
+                          <TableCell>{item.id}</TableCell>
+                          <TableCell>{item.typeText}</TableCell>
+                          <TableCell>{item.timestampText}</TableCell>
+                          <TableCell>{item.handler}</TableCell>
+                          <TableCell>
+                            {/* Use the reusable ResolveButton component */}
+                            <ResolveButton
+                              violationId={item.id}
+                              status={item.status}
+                              onResolved={() => {
+                                // Refresh table after resolving
+                                api
+                                  .get<{ items: Violation[] }>('/violations', { sort: 'ts:desc' })
+                                  .then((res) => setVisibleRows(res.items.map(toRow)));
+                              }}
+                            />
+                          </TableCell>
+                          <TableCell>
+                            <Button
+                              sx={{ maxWidth: 100 }}
+                              variant={'contained'}
+                              onClick={() => handleDetail(item)}
+                            >
+                              Detail
+                            </Button>
+                          </TableCell>
+                          <TableCell>
+                            <Bookmarkbutton violationId={item.id} />
+                          </TableCell>
                         </TableRow>
                       ))}
                     </TableBody>
@@ -217,111 +248,14 @@ export default function SearchViolations(): React.ReactElement {
               </CardContent>
             </Card>
           </Grid>
-          <Grid size={{ xs: 12, lg: 4 }}>
-            <Card sx={{ height: { xs: 'auto', md: '100%' }, border: '1px solid' }}>
-              <CardHeader
-                title={'Details'}
-                slotProps={{
-                  title: {
-                    variant: 'body1',
-                  },
-                }}
-              />
-              <Divider />
-              <CardContent
-                sx={{
-                  display: 'flex',
-                  height: { xs: 'auto', md: '100%' },
-                  minHeight: 0,
-                  flexDirection: 'column',
-                }}
-              >
-                <Stack
-                  sx={{
-                    flex: 8,
-                    border: '1px solid',
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                  }}
-                >
-                  {selected ? (
-                    <img
-                      src={selected?.imageUrl ?? ''}
-                      alt=""
-                      style={{
-                        minHeight: 0,
-                        maxWidth: '100%',
-                        maxHeight: '750px',
-                        objectFit: 'contain',
-                      }}
-                    />
-                  ) : (
-                    <Typography> Click A row to preview</Typography>
-                  )}
-                </Stack>
-                <Stack sx={{ flex: 4 }}>
-                  {selected ? (
-                    <TableContainer sx={{ minHeight: '100px' }}>
-                      <Table stickyHeader>
-                        <TableHead>
-                          <TableRow>
-                            <TableCell>Id</TableCell>
-                            <TableCell width={'500px'}>Type</TableCell>
-                            <TableCell>Time</TableCell>
-                            <TableCell>Status</TableCell>
-                            <TableCell>Handler</TableCell>
-                            <TableCell>Action</TableCell>
-                          </TableRow>
-                        </TableHead>
-                        <TableBody>
-                          <TableRow>
-                            <TableCell>{selected?.id}</TableCell>
-                            <TableCell>{selected?.typeText}</TableCell>
-
-                            <TableCell>{selected?.timestampText}</TableCell>
-                            <TableCell>{selected?.status}</TableCell>
-                            <TableCell>{selected?.handler}</TableCell>
-                            <TableCell>
-                              <ResolveButton
-                                violationId={selected.id}
-                                status={selected.status}
-                                onResolved={() => {
-                                  // Resolve 成功后，刷新列表
-                                  api
-                                    .get<{
-                                      items: Violation[];
-                                      total: number;
-                                      skip: number;
-                                      take: number;
-                                    }>('/violations', {
-                                      page,
-                                      pageSize: rowsPerPage,
-                                      sort: 'ts:desc',
-                                    })
-                                    .then((res) => {
-                                      setVisibleRows(res.items.map(toRow));
-                                      setTotal(res.total);
-                                      setSelected(null); // 关闭详情
-                                    });
-                                }}
-                              />
-                            </TableCell>
-                            <TableCell>
-                              <Bookmarkbutton violationId={selected?.id} />
-                            </TableCell>
-                          </TableRow>
-                        </TableBody>
-                      </Table>
-                    </TableContainer>
-                  ) : (
-                    <Typography> Click A row to preview</Typography>
-                  )}
-                </Stack>
-              </CardContent>
-            </Card>
-          </Grid>
         </Grid>
       </Grid>
+      <ViolationDetailDialog
+        open={detailOpen}
+        violation={selected}
+        onClose={() => setDetailOpen(false)}
+        onResolve={handleResolve}
+      />
     </Grid>
   );
 }
