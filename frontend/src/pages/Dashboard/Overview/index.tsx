@@ -168,11 +168,24 @@ export default function Dashboard(): React.ReactElement {
             <Grid size={{ xs: 12, md: 6, lg: 3 }} sx={{ px: 4, mb: 1 }}>
               <Card sx={{ minHeight: { xs: 120, md: 140 } }}>
                 <CardHeader
-                  title="Active Alerts"
+                  title={
+                    <Typography variant="h6" sx={{ fontWeight: 600 }}>
+                      ALerts
+                    </Typography>
+                  }
+                  subheader={
+                    <Typography
+                      variant="body2"
+                      sx={{ color: 'text.secondary', fontSize: '0.85rem' }}
+                    >
+                      Current open alerts
+                    </Typography>
+                  }
                   slotProps={{
-                    title: { fontSize: '0.9rem' },
+                    title: { fontSize: '1rem' },
+                    subheader: { fontSize: '0.8rem' },
                   }}
-                ></CardHeader>
+                />
                 <Divider />
                 <CardContent>
                   <Grid container spacing={4}>
@@ -192,17 +205,24 @@ export default function Dashboard(): React.ReactElement {
               <Card sx={{ minHeight: { xs: 120, md: 140 } }}>
                 <CardHeader
                   title={
-                    <Typography variant={'h6'}>
+                    <Typography variant="h6" sx={{ fontWeight: 600 }}>
                       Trend
-                      <span style={{ color: 'grey', fontSize: '0.9rem' }}>
-                        Relative to yesterday
-                      </span>
+                    </Typography>
+                  }
+                  subheader={
+                    <Typography
+                      variant="body2"
+                      sx={{ color: 'text.secondary', fontSize: '0.85rem' }}
+                    >
+                      Relative to yesterday
                     </Typography>
                   }
                   slotProps={{
-                    title: { fontSize: '0.9rem' },
+                    title: { fontSize: '1rem' },
+                    subheader: { fontSize: '0.8rem' },
                   }}
-                ></CardHeader>
+                />
+
                 <Divider />
                 <CardContent>
                   <Grid container spacing={4}>
@@ -240,11 +260,24 @@ export default function Dashboard(): React.ReactElement {
             <Grid size={{ xs: 12, md: 6, lg: 3 }} sx={{ px: 4, mb: 1 }}>
               <Card sx={{ minHeight: { xs: 120, md: 140 } }}>
                 <CardHeader
-                  title="Today's Violations"
+                  title={
+                    <Typography variant="h6" sx={{ fontWeight: 600 }}>
+                      {"Today's Violations"}
+                    </Typography>
+                  }
+                  subheader={
+                    <Typography
+                      variant="body2"
+                      sx={{ color: 'text.secondary', fontSize: '0.85rem' }}
+                    >
+                      Detected today
+                    </Typography>
+                  }
                   slotProps={{
-                    title: { fontSize: '0.9rem' },
+                    title: { fontSize: '1rem' },
+                    subheader: { fontSize: '0.8rem' },
                   }}
-                ></CardHeader>
+                />
                 <Divider />
                 <CardContent>
                   <Grid container spacing={4}>
@@ -263,11 +296,24 @@ export default function Dashboard(): React.ReactElement {
             <Grid size={{ xs: 12, md: 6, lg: 3 }} sx={{ px: 4, mb: 1 }}>
               <Card sx={{ minHeight: { xs: 120, md: 140 } }}>
                 <CardHeader
-                  title="Camera Health"
+                  title={
+                    <Typography variant="h6" sx={{ fontWeight: 600 }}>
+                      Camera Health
+                    </Typography>
+                  }
+                  subheader={
+                    <Typography
+                      variant="body2"
+                      sx={{ color: 'text.secondary', fontSize: '0.85rem' }}
+                    >
+                      Online / Total
+                    </Typography>
+                  }
                   slotProps={{
-                    title: { fontSize: '0.9rem' },
+                    title: { fontSize: '1rem' },
+                    subheader: { fontSize: '0.8rem' },
                   }}
-                ></CardHeader>
+                />
                 <Divider />
                 <CardContent>
                   <Grid container spacing={4}>
