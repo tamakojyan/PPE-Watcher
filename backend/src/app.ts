@@ -13,6 +13,10 @@ import auth from "./routes/auth";
 import bookmark from "./routes/bookmark";
 import configRoutes from "@routes/config";
 import eventRoutes from './routes/events';
+import multipart from '@fastify/multipart';
+import fastifyStatic from '@fastify/static';
+import path from 'path';
+
 
 export function buildApp(): FastifyInstance {
     const app = fastify({
@@ -53,7 +57,11 @@ export function buildApp(): FastifyInstance {
     app.register(swaggerUi, { routePrefix: '/docs' });
 
 
-
+    app.register(multipart, {
+        limits: {
+            fileSize: 10 * 1024 * 1024, // 10MB
+        },
+    });
     app.register(auth);
     app.register(users);
     app.register(contacts);
@@ -62,6 +70,13 @@ export function buildApp(): FastifyInstance {
     app.register(bookmark);
     app.register(configRoutes)
     app.register(eventRoutes);
-
+    app.register(fastifyStatic, {
+        root: path.join(process.cwd(), 'uploads'),
+        prefix: '/uploads/',
+        setHeaders: (res) => {
+            res.setHeader('Access-Control-Allow-Origin', '*');
+            res.setHeader('Cross-Origin-Resource-Policy', 'cross-origin'); // 
+        },
+    });
     return app;
 }

@@ -74,7 +74,11 @@ export default function SearchViolations(): React.ReactElement {
       status: v.status,
       // Format timestamp into human-readable form
       timestampText: formatTs(v.ts),
-      imageUrl: v.snapshotUrl ?? null,
+      imageUrl: v.snapshotUrl
+        ? v.snapshotUrl.startsWith('http')
+          ? v.snapshotUrl
+          : `${api.baseURL}/uploads/${v.snapshotUrl.split('/').pop()}`
+        : null,
       confidence: v.confidence,
       handler: v.handler, // Pass through handler for UI usage
     };

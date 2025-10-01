@@ -15,7 +15,8 @@ import {
 } from './_utils';
 import { startOfDay, subDays } from 'date-fns';
 import { broadcastEvent } from './events';
-
+import fs from 'fs';
+import path from 'path';
 
 export default async function violationRoutes(app: FastifyInstance) {
     /**
@@ -102,6 +103,12 @@ export default async function violationRoutes(app: FastifyInstance) {
             }),
             prisma.violation.count({where}),
         ]);
+        for (const v of items) {
+            if (v.snapshotUrl && !v.snapshotUrl.startsWith('http')) {
+                v.snapshotUrl = `/uploads/${path.basename(v.snapshotUrl)}`;
+            }
+        }
+        
         return {items, total, skip, take, orderBy};
     });
 
@@ -213,36 +220,50 @@ export default async function violationRoutes(app: FastifyInstance) {
      * POST /violations
      * Body: { id, confidence?, snapshotUrl?, status? }
      */
-    // POST /violations
+
+
+
+// 上传接口
     app.post('/violations', async (req, reply) => {
-        const body = req.body as {
-            confidence?: number | null;
-            snapshotUrl?: string | null;
-            kinds: string[]; // 调用方传的数组，比如 ["no_mask","no_helmet"]
-        };
-
         const newId = generateId("VIO");
+        let filePath: string | null = null;
+        let kinds: string[] = [];
 
-        // create violation + related kinds
+        // 遍历 multipart 所有部分
+        const parts = req.parts();
+        for await (const part of parts) {
+            if (part.type === 'file') {
+                // 处理文件
+                const uploadDir = path.join(process.cwd(), 'uploads');
+                if (!fs.existsSync(uploadDir)) {
+                    fs.mkdirSync(uploadDir, { recursive: true });
+                }
+                filePath = path.join(uploadDir, `${newId}_${part.filename}`);
+                await fs.promises.writeFile(filePath, await part.toBuffer());
+            } else if (part.type === 'field' && part.fieldname === 'kinds') {
+                try {
+                    kinds = JSON.parse(part.value as string);
+                } catch {
+                    kinds = [];
+                }
+            }
+        }
+
+        // 写数据库
         const created = await prisma.violation.create({
             data: {
                 id: newId,
-                confidence: body.confidence ?? null,
-                snapshotUrl: body.snapshotUrl ?? null,
+                snapshotUrl: filePath,
                 status: 'open',
-                kinds: body.kinds?.length
-                    ? {
-                        create: body.kinds.map((k) => ({
-                            type: k as ViolationType, // Prisma 会自动关联 violationId
-                        })),
-                    }
-                    : undefined,
+                kinds: {
+                    create: kinds.map((k) => ({ type: k as ViolationType })),
+                },
             },
             include: { kinds: true },
         });
 
-        // create notification
-        const notif = await prisma.notification.create({
+        // 通知
+        await prisma.notification.create({
             data: {
                 id: generateId("NTF"),
                 type: 'violation',
@@ -252,19 +273,12 @@ export default async function violationRoutes(app: FastifyInstance) {
             },
         });
 
-        // send to all contacts
-        const contacts = await prisma.contact.findMany();
-        for (const c of contacts) {
-            if (c.email) await sendEmail(c.email, 'New Violation', notif.message || '');
-            if (c.phone) await sendSMS(c.phone, notif.message || '');
-        }
-
-        reply.code(201).send(created);
+        // 广播
         broadcastEvent({ type: 'violation_created', id: newId });
         console.log('📢 Broadcast violation_created', created.id);
 
+        reply.code(201).send(created);
     });
-
 
     /**
      * PATCH /api/violations/:id

@@ -14,6 +14,8 @@ export enum ViolationType {
   no_mask = 'no_mask',
   no_vest = 'no_vest',
   no_gloves = 'no_gloves',
+  no_goggles = 'no_goggles',
+  no_boots = 'no_boots',
 }
 
 export enum ViolationStatus {

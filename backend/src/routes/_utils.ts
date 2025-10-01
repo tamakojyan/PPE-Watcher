@@ -69,7 +69,7 @@ export function generateId(prefix: string): string {
 
 // literals aligned with schema enums
 export const VIOLATION_STATUS = ['open', 'resolved'] as const;
+export const VIOLATION_TYPES  = ['no_helmet', 'no_mask', 'no_vest', 'no_gloves','no_goggles','no_boots'] as const;
 export type ViolationType = typeof VIOLATION_TYPES[number]
-export const VIOLATION_TYPES  = ['no_helmet', 'no_mask', 'no_vest', 'no_gloves'] as const;
 export const NOTIF_STATUS = ['read', 'unread'] as const;
 export const NOTIF_TYPES  = ['violation', 'resolved'] as const;

@@ -17,7 +17,7 @@ import {
 import { Violation } from '@/type';
 import ResolveButton from './ResolveButton';
 import BookmarkButton from './BookmarkButton';
-
+import api from '../api/client';
 type Props = {
   open: boolean;
   violation: Violation | null;
@@ -43,7 +43,11 @@ export default function ViolationDetailDialog({
         <div style={{ textAlign: 'center', marginBottom: '1rem' }}>
           {violation.snapshotUrl ? (
             <img
-              src={violation.snapshotUrl}
+              src={
+                violation.snapshotUrl.startsWith('http')
+                  ? violation.snapshotUrl
+                  : `${api.baseURL}/uploads/${violation.snapshotUrl.split('/').pop()}`
+              }
               alt="Violation snapshot"
               style={{
                 maxWidth: '100%',

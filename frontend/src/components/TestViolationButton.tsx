@@ -1,25 +1,44 @@
+import { useState } from 'react';
 import { Button } from '@mui/material';
-import api from '../api/client'; // 你的封装好的 axios/fetch 客户端
 
 export default function TestViolationButton() {
-  async function handleClick() {
+  const [file, setFile] = useState<File | null>(null);
+
+  async function handleUpload() {
+    if (!file) {
+      alert('请先选择一个文件');
+      return;
+    }
+
     try {
-      const res = await api.post('/violations', {
-        confidence: 0.92,
-        snapshotUrl: 'https://via.placeholder.com/300.png', // 测试图片
-        kinds: ['no_mask', 'no_helmet'], // 测试类型
+      // 构造 FormData
+      const formData = new FormData();
+      formData.append('file', file); // 👈 上传的截图
+      formData.append('kinds', JSON.stringify(['no_mask', 'no_helmet'])); // 👈 测试类型
+
+      // 直接 fetch，不走封装
+      const res = await fetch('http://localhost:8080/violations', {
+        method: 'POST',
+        body: formData,
       });
-      alert('Violation created:\n' + JSON.stringify(res, null, 2));
-      console.log('Created violation:', res);
+
+      if (!res.ok) throw new Error(`上传失败: ${res.status}`);
+      const data = await res.json();
+
+      console.log('✅ 上传成功', data);
+      alert('上传成功: ' + JSON.stringify(data));
     } catch (err) {
-      console.error('Failed to create violation:', err);
-      alert('Error creating violation, check console');
+      console.error('❌ 上传出错:', err);
+      alert('上传失败: ' + err);
     }
   }
 
   return (
-    <Button variant="contained" color="primary" onClick={handleClick}>
-      Create Test Violation
-    </Button>
+    <div>
+      <input type="file" accept="image/*" onChange={(e) => setFile(e.target.files?.[0] || null)} />
+      <Button variant="contained" color="primary" onClick={handleUpload}>
+        上传违章截图（绕过封装）
+      </Button>
+    </div>
   );
 }

@@ -27,6 +27,8 @@ enum ViolationType {
   no_mask
   no_vest
   no_gloves
+  no_goggles
+  no_boots
 }
 
 model User {
@@ -57,13 +59,12 @@ model Contact {
 }
 
 model Violation {
-  id          String          @id // Manually assigned, e.g. "VIO001"
-  kinds       ViolationKind[] // Type of violation (e.g. no_helmet)
-  confidence  Float?
-  ts          DateTime        @default(now())
-  snapshotUrl String?
-  status      ViolationStatus @default(open) //
-  handler     String?
+  id           String                  @id // Manually assigned, e.g. "VIO001"
+  kinds        ViolationKind[] // Type of violation (e.g. no_helmet)
+  ts           DateTime                @default(now())
+  snapshotUrl  String?
+  status       ViolationStatus         @default(open) //
+  handler      String?
   // Derived notifications (no alerts table, notifications directly linked to violation)
   notices      Notification[]
   bookmarkedBy UserViolationBookmark[]
@@ -121,7 +122,7 @@ model UserViolationBookmark {
 
 model SystemConfig {
   id        Int      @id @default(autoincrement()) // Primary key, auto-increment
-  key       String   @unique                      // Configuration key, e.g., "smtp_host"
-  value     String                                // Configuration value (string or JSON string)
-  updatedAt DateTime @updatedAt                   // Timestamp of the last update (auto-managed)
+  key       String   @unique // Configuration key, e.g., "smtp_host"
+  value     String // Configuration value (string or JSON string)
+  updatedAt DateTime @updatedAt // Timestamp of the last update (auto-managed)
 }
