@@ -1,9 +1,0 @@
-{
-  "dependencies": {
-    "nodemailer": "^7.0.6",
-    "twilio": "^5.9.0"
-  },
-  "devDependencies": {
-    "@types/nodemailer": "^7.0.1"
-  }
-}
