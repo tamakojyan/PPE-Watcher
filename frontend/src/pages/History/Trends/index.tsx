@@ -93,6 +93,7 @@ export default function Trends(): React.ReactElement {
         }
       );
       setViolations(res.items);
+      console.log(res.items);
     })();
   }, [dateRange, tick]);
 
@@ -185,7 +186,7 @@ export default function Trends(): React.ReactElement {
                       height={40}
                       angle={-30}
                       textAnchor="end"
-                      interval="preserveEnd"
+                      interval={0}
                       tick={{ fontSize: 12, fill: theme.palette.text.secondary }}
                       axisLine={{ stroke: theme.palette.divider }}
                       tickLine={{ stroke: theme.palette.divider }}

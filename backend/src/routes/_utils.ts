@@ -6,7 +6,7 @@ import { format } from "date-fns";
 export function getPagination(req: FastifyRequest) {
     const q = req.query as any;
     const page = Math.max(Number(q?.page ?? 0), 0);
-    const pageSize = Math.min(Math.max(Number(q?.pageSize ?? 0), 0), 100);
+    const pageSize = Math.min(Math.max(Number(q?.pageSize ?? 0), 0), 1000);
 
     let skip = Number(q?.skip ?? 0);
     let take = Number(q?.take ?? 0);
@@ -15,7 +15,7 @@ export function getPagination(req: FastifyRequest) {
         return { skip: page * pageSize, take: pageSize };
     }
     // fallback to skip/take
-    return { skip: Math.max(skip, 0), take: Math.min(take || 20, 100) };
+    return { skip: Math.max(skip, 0), take: Math.min(take || 20, 1000) };
 }
 
 export function toDate(v?: unknown) {

@@ -16,7 +16,6 @@ import {
   CardHeader,
   Divider,
 } from '@mui/material';
-import TestViolationButton from '../../../components/TestViolationButton';
 import DateRangePicker from '../../../components/DateRangePicker';
 import KeywordSearch from '../../../components/KeywordSearch';
 
@@ -149,10 +148,7 @@ export default function SearchViolations(): React.ReactElement {
           <Grid size={{ xs: 6, md: 10 }}>
             <Typography variant={'h6'}>Search Violations</Typography>
           </Grid>
-          <Grid size={{ xs: 3, md: 1 }}>
-            <TestViolationButton />
-          </Grid>
-          <Grid size={{ xs: 3, md: 1 }}>
+          <Grid size={{ xs: 3, md: 2 }}>
             <Button>Help</Button>
           </Grid>
         </Grid>
