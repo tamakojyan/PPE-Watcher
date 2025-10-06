@@ -1,7 +1,5 @@
-import * as react from 'react';
 import {
   Grid,
-  Stack,
   Button,
   Table,
   TableBody,
@@ -16,6 +14,8 @@ import {
   CardHeader,
   Divider,
 } from '@mui/material';
+import UploadViolationButton from '../../../components/UploadViolationButton';
+
 import DateRangePicker from '../../../components/DateRangePicker';
 import KeywordSearch from '../../../components/KeywordSearch';
 
@@ -149,6 +149,7 @@ export default function SearchViolations(): React.ReactElement {
             <Typography variant={'h6'}>Search Violations</Typography>
           </Grid>
           <Grid size={{ xs: 3, md: 2 }}>
+            <UploadViolationButton />
             <Button>Help</Button>
           </Grid>
         </Grid>

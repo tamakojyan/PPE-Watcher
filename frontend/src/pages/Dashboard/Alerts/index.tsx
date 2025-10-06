@@ -1,4 +1,3 @@
-import * as react from 'react';
 import {
   Stack,
   Grid,
@@ -9,7 +8,6 @@ import {
   TableHead,
   TableRow,
   Typography,
-  TableFooter,
   Button,
   Paper,
   Card,

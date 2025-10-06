@@ -47,7 +47,6 @@ export const MENU_CONFIG: MainItem[] = [
   },
 ];
 
-// 工具：根据 URL 推断当前主菜单（高亮用）
 export function deriveMainKey(pathname: string): MainKey {
   if (pathname.startsWith('/settings')) return 'settings';
   if (pathname.startsWith('/history')) return 'events';

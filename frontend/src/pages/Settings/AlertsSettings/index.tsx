@@ -19,15 +19,14 @@ import { useState, useEffect } from 'react';
 import api from '../../../api/client';
 
 // Available PPE types
-const PPE_TYPES: string[] = [
-  'Helmet',
-  'Mask',
-  'Reflective Vest',
-  'Safety Gloves',
-  'Goggles',
-  'Safety Boots',
-];
-
+const PPE_TYPES: Record<string, string> = {
+  no_helmet: 'Helmet',
+  no_mask: 'Mask',
+  no_vest: 'Vest',
+  no_gloves: 'Gloves',
+  no_goggles: 'Goggles',
+  no_boots: 'Boots',
+};
 // Available Notification types
 const NOTIFICATION_TYPES: string[] = ['EMAIL', 'SMS'];
 
@@ -103,14 +102,14 @@ export default function AlertSettings(): React.ReactElement {
                   },
                 }}
               >
-                {PPE_TYPES.map((item) => (
+                {Object.entries(PPE_TYPES).map(([key, label]) => (
                   <FormControlLabel
-                    key={item}
-                    label={item}
+                    key={key}
+                    label={label} //
                     control={
                       <Checkbox
-                        checked={selectedPPE.includes(item)}
-                        onChange={() => handlePPEChange(item)}
+                        checked={selectedPPE.includes(key)} //
+                        onChange={() => handlePPEChange(key)}
                       />
                     }
                   />

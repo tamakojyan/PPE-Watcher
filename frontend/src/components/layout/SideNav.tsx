@@ -11,7 +11,7 @@ type Props = {
 type MainKey = 'dashboard' | 'history' | 'settings';
 
 const GROUPS: Record<MainKey, Set<string>> = {
-  dashboard: new Set(['overview', 'live', 'alerts']),
+  dashboard: new Set(['overview', 'alerts']),
   history: new Set(['violations', 'trends', 'notifications', 'bookmarks']),
   settings: new Set(['alerts-settings', 'contacts', 'sender', 'security']),
 };
@@ -26,7 +26,6 @@ function deriveMainKey(pathname: string): MainKey {
 const SUB_ITEMS: Record<MainKey, { to: string; label: string }[]> = {
   dashboard: [
     { to: '/overview', label: 'Overview' },
-    { to: '/live', label: 'Live Feed' },
     { to: '/alerts', label: 'Alerts' },
   ],
   history: [

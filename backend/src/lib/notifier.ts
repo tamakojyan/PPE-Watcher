@@ -8,6 +8,8 @@ export async function sendEmail(to: string, subject: string, text: string) {
     const smtpPort = Number(config.find((c) => c.key === 'smtp_port')?.value || 587);
     const smtpUser = config.find((c) => c.key === 'smtp_user')?.value;
     const smtpPass = config.find((c) => c.key === 'smtp_password')?.value;
+    const smtpSender: string | undefined = config.find((c) => c.key === 'smtp_sender')?.value;
+
     if (!smtpHost || !smtpUser || !smtpPass) {
         console.log("Skipping email send, SMTP not configured");
         return;
@@ -20,7 +22,7 @@ export async function sendEmail(to: string, subject: string, text: string) {
     });
 
     await transporter.sendMail({
-        from: smtpUser,
+        from: smtpSender,
         to,
         subject,
         text,

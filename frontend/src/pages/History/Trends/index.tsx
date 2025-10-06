@@ -1,5 +1,4 @@
-import * as react from 'react';
-import { Chip, Grid, Stack, Typography, Divider, Button, Box } from '@mui/material';
+import { Grid, Stack, Typography, Divider, Button, Box } from '@mui/material';
 import { useTheme } from '@mui/material';
 import {
   ResponsiveContainer,
@@ -313,7 +312,6 @@ export default function Trends(): React.ReactElement {
                 <Divider sx={{ my: 1 }} />
                 <Typography variant="subtitle2">By Type</Typography>
 
-                {/* 饼图区域占满剩余高度 */}
                 <Box sx={{ flex: 1, minHeight: 0 }}>
                   <ResponsiveContainer width="100%" height="100%">
                     <PieChart>

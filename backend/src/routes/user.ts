@@ -58,24 +58,6 @@
             return prisma.user.findUniqueOrThrow({ where: { id } });
         });
 
-        /**
-         * POST /users
-         * Create a new user
-         */
-        app.post('/users', async (req, reply) => {
-            const { id, email, password } = req.body as {
-                id: string;
-                email: string;
-                password: string;
-            };
-            try {
-                const created = await prisma.user.create({ data: { id, email, password } });
-                return reply.code(201).send(created);
-            } catch (e: any) {
-                if (e?.code === 'P2002') return reply.code(409).send({ message: 'Email already exists' });
-                throw e;
-            }
-        });
 
         /**
          * PATCH /users/:id

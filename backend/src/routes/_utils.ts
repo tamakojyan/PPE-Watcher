@@ -1,5 +1,4 @@
 import type { FastifyRequest } from 'fastify';
-import {Prisma} from '@prisma/client';
 import { format } from "date-fns";
 
 // pagination: support (?page=1&pageSize=20) or (?skip=0&take=20)

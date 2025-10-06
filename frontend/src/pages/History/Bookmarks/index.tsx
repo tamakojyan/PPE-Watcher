@@ -1,4 +1,3 @@
-import * as react from 'react';
 import {
   Grid,
   Button,
@@ -17,7 +16,7 @@ import {
 } from '@mui/material';
 import { useTheme } from '@mui/material';
 
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useEffect } from 'react';
 import { getMyBookmarks } from '../../../api/bookmark';
 import { useBookmarksFromOutlet } from '../../../hooks/useBookmarksFromOutlet';
 import Bookmarkbutton from '../../../components/BookmarkButton';
@@ -25,7 +24,6 @@ import DateRangePicker from '../../../components/DateRangePicker';
 import KeywordSearch from '../../../components/KeywordSearch';
 import ViolationDetailDialog from '../../../components/ViolationDetailDialog';
 import { Violation, ViolationKind, ViolationType, ViolationStatus } from '@/type';
-import { RefreshContext } from '../../../components/layout/AppShell';
 export default function Bookmarks(): React.ReactElement {
   const { loading } = useBookmarksFromOutlet();
   const [filters, setFilters] = useState<{ from?: number; to?: number; keyword?: string }>({});
@@ -39,7 +37,7 @@ export default function Bookmarks(): React.ReactElement {
     imageUrl?: string | null;
     confidence?: number;
     handler?: string;
-    raw: Violation; // ✅ keep full Violation for Detail
+    raw: Violation; // keep full Violation for Detail
   };
 
   // --- Utilities for formatting ---
@@ -206,7 +204,7 @@ export default function Bookmarks(): React.ReactElement {
                         </Button>
                       </TableCell>
                       <TableCell>
-                        {/* ✅ Only here: remove row immediately after unbookmark */}
+                        {/* Only here: remove row immediately after unbookmark */}
                         <Bookmarkbutton
                           violationId={row.id}
                           onChange={() => {
@@ -233,7 +231,7 @@ export default function Bookmarks(): React.ReactElement {
         </Card>
       </Grid>
 
-      {/* ✅ Violation Detail Dialog */}
+      {/*  Violation Detail Dialog */}
       <ViolationDetailDialog
         open={!!selectedViolation}
         violation={selectedViolation}

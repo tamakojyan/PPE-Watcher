@@ -1,7 +1,7 @@
 import type { FastifyInstance } from 'fastify';
 import { prisma } from '@lib/prisma';
-import {Prisma } from '@prisma/client';
-import { getPagination, toEnum, toDate, parseSort, NOTIF_STATUS, NOTIF_TYPES } from './_utils';
+import {Prisma} from '@prisma/client';
+import { getPagination, toEnum, parseSort, NOTIF_STATUS, NOTIF_TYPES } from './_utils';
 
 export default async function notificationRoutes(app: FastifyInstance) {
     /**

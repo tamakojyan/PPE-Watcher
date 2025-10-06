@@ -121,7 +121,7 @@ export default async function bookmarkRoutes(app: FastifyInstance) {
                 orderBy: { createdAt: 'desc' },
             });
 
-            return rows.map((r) => r.violationId);
+            return rows.map(( r:any) => r.violationId);
         }
     );
 

@@ -13,18 +13,15 @@ import {
   TableBody,
   TableRow,
   TableCell,
-  IconButton,
 } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import { useEffect, useState, useContext } from 'react';
 import ErrorIcon from '@mui/icons-material/Error';
-import { useTheme } from '@mui/material/styles';
 import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
 import ViolationDetailDialog from '../../../components/ViolationDetailDialog';
 import { RefreshContext } from '../../../components/layout/AppShell';
 
 import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
-import RemoveIcon from '@mui/icons-material/Remove';
 import VideocamIcon from '@mui/icons-material/Videocam';
 import EventIcon from '@mui/icons-material/Event';
 import api from '../../../api/client';
@@ -56,7 +53,6 @@ export default function Dashboard(): React.ReactElement {
   console.log(stats);
   const navigate = useNavigate();
   const openCount = stats?.open ?? 0;
-  const theme = useTheme();
 
   // UI-friendly row type for the table and detail panel
   type ViolationRow = {

@@ -1,8 +1,6 @@
 import { createBrowserRouter, RouteObject, Navigate } from 'react-router-dom';
 
-// 直接从“分组文件夹”里导入组件
 import Overview from 'pages/Dashboard/Overview';
-import LiveFeed from 'pages/Dashboard/LiveFeed';
 import Alerts from 'pages/Dashboard/Alerts';
 
 import SearchViolations from 'pages/History/SearchViolations';
@@ -29,7 +27,6 @@ const routes: RouteObject[] = [
 
       // Dashboard group (flat URLs)
       { path: 'overview', element: <Overview /> },
-      { path: 'live', element: <LiveFeed /> },
       { path: 'alerts', element: <Alerts /> },
 
       // History group (flat URLs)

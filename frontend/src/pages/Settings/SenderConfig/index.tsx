@@ -21,7 +21,7 @@ export default function SenderConfig(): React.ReactElement {
   const [smtpPort, setSmtpPort] = useState('');
   const [smtpUser, setSmtpUser] = useState('');
   const [smtpPassword, setSmtpPassword] = useState('');
-
+  const [smtpSender, setSmtpSender] = useState('');
   // SMS configs
   const [smsProvider, setSmsProvider] = useState('');
   const [smsSid, setSmsSid] = useState('');
@@ -41,6 +41,7 @@ export default function SenderConfig(): React.ReactElement {
       setSmsSid(data.sms_sid || '');
       setSmsToken(data.sms_token || '');
       setSmsFrom(data.sms_from || '');
+      setSmtpSender(data.smtp_sender || '');
     });
   }, []);
 
@@ -53,6 +54,7 @@ export default function SenderConfig(): React.ReactElement {
         smtp_port: smtpPort,
         smtp_user: smtpUser,
         smtp_password: smtpPassword,
+        smtp_sender: smtpSender,
       });
       alert('Email settings updated successfully!');
     } catch (err) {
@@ -141,6 +143,18 @@ export default function SenderConfig(): React.ReactElement {
                 />
                 <Typography variant="caption" color="text.secondary">
                   example: API key or SMTP password
+                </Typography>
+              </Grid>
+              <Grid size={{ xs: 12, md: 6 }}>
+                <TextField
+                  label={'Sender Email'}
+                  value={smtpSender}
+                  onChange={(e) => setSmtpSender(e.target.value)}
+                  placeholder={'noreply@yourdomain.com'}
+                  fullWidth
+                />
+                <Typography variant="caption" color="text.secondary">
+                  example: noreply@yourdomain.com
                 </Typography>
               </Grid>
               <Grid

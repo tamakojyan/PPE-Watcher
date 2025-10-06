@@ -205,11 +205,34 @@ export default async function violationRoutes(app: FastifyInstance) {
 
             // send to all contacts
             const contacts = await prisma.contact.findMany();
+            // === Load notification types from systemConfig ===
+            const systemConfig = await prisma.systemConfig.findMany();
+            const notifTypesStr =
+                systemConfig.find((c) => c.key === 'notification_types')?.value || '[]';
+            const notifTypes = JSON.parse(notifTypesStr) as string[];
+
+            // === Load SMTP and SMS config values ===
+            const smtpSender = systemConfig.find((c) => c.key === 'smtp_sender')?.value;
+            const smsFrom = systemConfig.find((c) => c.key === 'sms_from')?.value;
+
+            // === Send notifications based on config ===
             for (const c of contacts) {
-                if (c.email)
-                    await sendEmail(c.email, 'Violation Resolved', notif.message || '');
-                if (c.phone)
-                    await sendSMS(c.phone, notif.message || '');
+                // Send email if EMAIL is enabled
+                if (notifTypes.includes('EMAIL') && c.email && smtpSender) {
+                    await sendEmail(
+                        c.email,
+                        'Violation Resolved',
+                        `The violation ${id} was resolved by ${handler}.`
+                    );
+                }
+
+                // Send SMS if SMS is enabled
+                if (notifTypes.includes('SMS') && c.phone && smsFrom) {
+                    await sendSMS(
+                        c.phone,
+                        `The violation ${id} was resolved by ${handler}.`
+                    );
+                }
             }
             broadcastEvent({ type: 'violation_resolved', id });
             return updated;
@@ -223,17 +246,14 @@ export default async function violationRoutes(app: FastifyInstance) {
 
 
 
-// 上传接口
     app.post('/violations', async (req, reply) => {
         const newId = generateId("VIO");
         let filePath: string | null = null;
         let kinds: string[] = [];
 
-        // 遍历 multipart 所有部分
         const parts = req.parts();
         for await (const part of parts) {
             if (part.type === 'file') {
-                // 处理文件
                 const uploadDir = path.join(process.cwd(), 'uploads');
                 if (!fs.existsSync(uploadDir)) {
                     fs.mkdirSync(uploadDir, { recursive: true });
@@ -249,7 +269,6 @@ export default async function violationRoutes(app: FastifyInstance) {
             }
         }
 
-        // 写数据库
         const created = await prisma.violation.create({
             data: {
                 id: newId,
@@ -262,7 +281,6 @@ export default async function violationRoutes(app: FastifyInstance) {
             include: { kinds: true },
         });
 
-        // 通知
         await prisma.notification.create({
             data: {
                 id: generateId("NTF"),
@@ -272,8 +290,59 @@ export default async function violationRoutes(app: FastifyInstance) {
                 message: 'New violation detected',
             },
         });
+        // === Conditional SMS/Email notification ===
+        try {
+            // Load system configs
+            const config = await prisma.systemConfig.findMany();
 
-        // 广播
+            // Notification types enabled in system (e.g. ["EMAIL","SMS"])
+            const enabledNotifications = JSON.parse(
+                config.find((c) => c.key === 'notification_types')?.value || '[]'
+            ) as string[];
+
+            // Allowed PPE violation types (e.g. ["Helmet","Mask","Goggles","Safety Boots"])
+            const allowedTypes = JSON.parse(
+                config.find((c) => c.key === 'ppe_types')?.value || '[]'
+            ) as string[];
+
+            // === Filter: Only send notifications if detected kinds are in allowedTypes ===
+            const validKinds = kinds.filter((k) => allowedTypes.includes(k));
+            if (validKinds.length === 0) {
+                console.log('⚠️ No valid violation types for notification, skipping.');
+                return reply.code(201).send(created);
+            }
+
+            // === SMS Notifications ===
+            if (enabledNotifications.includes('SMS')) {
+                const contacts = await prisma.contact.findMany({ where: { phone: { not: null } } });
+                for (const contact of contacts) {
+                    if (!contact.phone) continue;
+                    const msg = `🚨 PPE Violation Detected (${created.id})\nType(s): ${validKinds.join(', ')}`;
+                    await sendSMS(contact.phone, msg);
+                    console.log(`📨 SMS sent to ${contact.name}: ${contact.phone}`);
+                }
+            }
+
+            // === Email Notifications ===
+            if (enabledNotifications.includes('EMAIL')) {
+                const contacts = await prisma.contact.findMany({ where: { email: { not: null } } });
+                for (const contact of contacts) {
+                    if (!contact.email) continue;
+                    const subject = `PPE Violation Detected (${created.id})`;
+                    const text = `A new PPE violation was detected.\nType(s): ${validKinds.join(', ')}\n\nCheck the dashboard for more details.`;
+                    await sendEmail(contact.email, subject, text);
+                    console.log(`📧 Email sent to ${contact.name}: ${contact.email}`);
+                }
+            }
+        } catch (err) {
+            if (err instanceof Error) {
+                console.error('❌ Notification error:', err.message);
+            } else {
+                console.error('❌ Notification error:', err);
+            }
+        }
+
+
         broadcastEvent({ type: 'violation_created', id: newId });
         console.log('📢 Broadcast violation_created', created.id);
 
@@ -282,12 +351,10 @@ export default async function violationRoutes(app: FastifyInstance) {
 
     /**
      * PATCH /api/violations/:id
-     * Body 可包含：confidence / snapshotUrl / status / kinds（若提供 kinds 则整组替换）
      */
     app.patch('/violations/:id', async (req) => {
         const {id} = req.params as { id: string };
         const body = req.body as Partial<{
-            confidence: number | null;
             snapshotUrl: string | null;
             status: (typeof VIOLATION_STATUS)[number];
             kinds: (typeof VIOLATION_TYPES)[number][];
@@ -306,7 +373,6 @@ export default async function violationRoutes(app: FastifyInstance) {
         const update = prisma.violation.update({
             where: {id},
             data: {
-                confidence: body.confidence ?? undefined,
                 snapshotUrl: body.snapshotUrl ?? undefined,
                 status: body.status ?? undefined,
             },
@@ -359,7 +425,6 @@ export default async function violationRoutes(app: FastifyInstance) {
 
     /**
      * GET /api/violations/stats/daily?days=7
-     * 简单日统计：近 N 天每天的数量
      */
     app.get('/violations/stats/daily', async (req) => {
         const days = Math.min(Number((req.query as any)?.days ?? 7), 60);
