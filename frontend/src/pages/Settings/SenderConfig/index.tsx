@@ -125,11 +125,11 @@ export default function SenderConfig(): React.ReactElement {
                   label={'User'}
                   value={smtpUser}
                   onChange={(e) => setSmtpUser(e.target.value)}
-                  placeholder={'user@example.com'}
+                  placeholder={'apikey'}
                   fullWidth
                 />
                 <Typography variant="caption" color="text.secondary">
-                  example: no-reply@yourdomain.com
+                  example: apikey (for SendGrid SMTP user)
                 </Typography>
               </Grid>
               <Grid size={{ xs: 12, md: 6 }}>
