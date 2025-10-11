@@ -142,9 +142,5 @@ export default async function notificationRoutes(app: FastifyInstance) {
 
         return updated;
     });
-    app.delete('/notifications/:id', async (req, reply) => {
-        const { id } = req.params as { id: string };
-        await prisma.notification.delete({ where: { id } });
-        reply.code(204).send();
-    });
+
 }

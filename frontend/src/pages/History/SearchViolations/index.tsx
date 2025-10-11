@@ -147,9 +147,7 @@ export default function SearchViolations(): React.ReactElement {
           <Grid size={{ xs: 6, md: 10 }}>
             <Typography variant={'h6'}>Search Violations</Typography>
           </Grid>
-          <Grid size={{ xs: 3, md: 2 }}>
-            <Button>Help</Button>
-          </Grid>
+          <Grid size={{ xs: 3, md: 2 }}></Grid>
         </Grid>
       </Grid>
       <Grid size={{ xs: 12 }}>

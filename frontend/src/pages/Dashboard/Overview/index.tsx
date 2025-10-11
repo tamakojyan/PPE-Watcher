@@ -154,13 +154,6 @@ export default function Dashboard(): React.ReactElement {
             <Typography variant="h6" sx={{ flex: 1 }}>
               Overview
             </Typography>
-            <Button
-              variant="contained"
-              sx={{ boxShadow: 'none' }}
-              onClick={() => navigate('/live')}
-            >
-              Go live
-            </Button>
           </Stack>
         </Grid>
         <Grid size={{ xs: 12, md: 12 }}>

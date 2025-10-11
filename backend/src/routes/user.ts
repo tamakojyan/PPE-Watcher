@@ -79,20 +79,7 @@
             }
         });
 
-        /**
-         * DELETE /users/:id
-         * Delete a user by ID
-         */
-        app.delete('/users/:id', async (req, reply) => {
-            const { id } = req.params as { id: string };
-            try {
-                await prisma.user.delete({ where: { id } });
-                return reply.code(204).send();
-            } catch (e: any) {
-                if (e?.code === 'P2025') return reply.code(404).send({ message: 'User not found' });
-                throw e;
-            }
-        });
+
 
 
         app.get('/me/security', { preValidation: [app.authenticate] },async (req, reply) => {

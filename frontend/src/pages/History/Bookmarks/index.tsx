@@ -144,12 +144,8 @@ export default function Bookmarks(): React.ReactElement {
           <Grid size={{ xs: 6, md: 10 }}>
             <Typography variant={'h6'}>Bookmarks</Typography>
           </Grid>
-          <Grid size={{ xs: 3, md: 1 }}>
-            <Button> Export</Button>
-          </Grid>
-          <Grid size={{ xs: 3, md: 1 }}>
-            <Button>Help</Button>
-          </Grid>
+          <Grid size={{ xs: 3, md: 1 }}></Grid>
+          <Grid size={{ xs: 3, md: 1 }}></Grid>
         </Grid>
       </Grid>
 

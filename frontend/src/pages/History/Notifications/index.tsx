@@ -119,12 +119,8 @@ export default function Notifications(): React.ReactElement {
           <Grid size={{ xs: 6, md: 10 }}>
             <Typography variant={'h6'}>Notifications</Typography>
           </Grid>
-          <Grid size={{ xs: 3, md: 1 }}>
-            <Button> Export</Button>
-          </Grid>
-          <Grid size={{ xs: 3, md: 1 }}>
-            <Button>Help</Button>
-          </Grid>
+          <Grid size={{ xs: 3, md: 1 }}></Grid>
+          <Grid size={{ xs: 3, md: 1 }}></Grid>
         </Grid>
       </Grid>
       <Grid size={{ xs: 12 }}>

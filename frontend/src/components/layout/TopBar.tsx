@@ -7,6 +7,9 @@ import { useTheme } from '@mui/material/styles';
 import logoUrlD from '../../assets/images/Logo-Dark.png';
 import logoUrlL from '../../assets/images/Logo-Light.png';
 import { useNavigate } from 'react-router-dom';
+import IndicatorLight from './IndicatorLight';
+import { useContext } from 'react';
+import { RefreshContext } from './AppShell';
 
 type Props = {
   onMenuClick: () => void;
@@ -14,6 +17,8 @@ type Props = {
   isMobile: boolean;
 };
 export default function TopBar({ onMenuClick, isMobile, title }: Props): React.ReactElement {
+  const { tick } = useContext(RefreshContext);
+
   const navigate = useNavigate();
   const { toggleTheme } = useThemeControl();
   const theme = useTheme();
@@ -62,8 +67,19 @@ export default function TopBar({ onMenuClick, isMobile, title }: Props): React.R
           </Typography>
         )}
 
-        <Box sx={{ flex: 1, display: 'flex', justifyContent: 'flex-end' }}>
-          {' '}
+        <Box
+          sx={{
+            flex: 1,
+            display: 'flex',
+            justifyContent: 'flex-end',
+            alignItems: 'center',
+            gap: 2,
+          }}
+        >
+          {/* 指示灯组件：在右上角常亮显示 */}
+          <IndicatorLight tick={tick} />
+
+          {/* 主题切换按钮 */}
           <Tooltip title={isDark ? 'Switch to light' : 'Switch to dark'}>
             <IconButton color="inherit" onClick={toggleTheme} aria-label="toggle theme">
               {isDark ? <LightModeIcon /> : <DarkModeIcon />}

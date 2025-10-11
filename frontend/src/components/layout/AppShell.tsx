@@ -10,6 +10,7 @@ import MobileMenu from './MobileMenu';
 import MainNav from './MainNav';
 import { isAuthenticated } from '../../api/auth'; // your auth util
 import { getMyBookmarkIds, addBookmark, removeBookmark } from '../../api/bookmark';
+
 export const RefreshContext = React.createContext<{ tick: number }>({ tick: 0 });
 
 export type BookmarkOutletContext = {
@@ -33,7 +34,15 @@ export default function AppShell(): React.ReactElement {
 
     evtSource.onmessage = (event) => {
       console.log('📩 SSE message:', event.data);
-      setTick((t) => t + 1);
+      try {
+        const data = JSON.parse(event.data);
+        // ✅ 只在 violation_created 时触发 tick
+        if (data.type === 'violation_created') {
+          setTick((t) => t + 1);
+        }
+      } catch (err) {
+        console.error('Invalid SSE event:', err);
+      }
     };
 
     evtSource.onerror = (err) => {
