@@ -1,0 +1,217 @@
+JP6.x Ultralytics (YOLOv8/YOLO11) Full Setup — v2 (Engine‑First)
+Target: Jetson Orin • JetPack 6.1/6.2 (L4T 36.x) • Ubuntu 22.04 • Python 3.10 • aarch64
+
+How to use this file
+- Paste ONE block at a time into your Jetson terminal.
+- If you reboot, re-activate the venv (if used):  source ~/yoloenv/bin/activate
+- Camera: Step [8] is only for preview/record; your app runs separately.
+
+====================================
+[0] System check & base dependencies
+====================================
+sudo apt update 
+sudo apt install -y git python3-pip python3-venv build-essential pkg-config curl wget \
+                    v4l-utils libgtk-3-dev libopenblas-base
+
+# (optional) Add 6G swap to make installs more stable
+sudo fallocate -l 6G /swapfile && sudo chmod 600 /swapfile
+sudo mkswap /swapfile && sudo swapon /swapfile
+echo '/swapfile none swap sw 0 0' | sudo tee -a /etc/fstab
+
+# Check versions (expect L4T 36.x, Python 3.10.x)
+dpkg -l | grep nvidia-l4t-core || true
+python3 -V
+
+------------------------------------
+[0A] Optional: exFAT USB drive setup
+------------------------------------
+# Install exFAT support and mount your USB drive (handy for copying models/logs)
+sudo apt update
+sudo apt install -y exfat-fuse exfatprogs
+
+# Create a mount point (11 is the name of the USB)
+sudo mkdir -p /media/$USER/11
+
+# Find your device node (check with: lsblk)
+# Example: /dev/sda1 (preferred) or /dev/sda depending on your partition table.
+# Mount (choose the correct device accordingly):
+sudo mount.exfat-fuse /dev/sda1 /media/$USER/11  || sudo mount.exfat-fuse /dev/sda /media/$USER/11
+
+# To unmount later:
+#   sudo umount /media/$USER/11
+
+
+
+===========================
+[1] Create an isolated venv
+===========================
+# You can skip this if you prefer system Python, but venv reduces breakage.
+python3 -m venv ~/yoloenv
+source ~/yoloenv/bin/activate
+python -m pip install -U pip wheel setuptools
+
+=========================================
+[2] Install Ultralytics (with export extras)
+=========================================
+pip install "ultralytics[export]"
+
+# NOTE: pip may pull a generic CPU torch; we'll overwrite with Jetson wheels next.
+
+==================================================
+[3] Install PyTorch/torchvision (Jetson aarch64 WHL)
+==================================================
+# Wheels compatible with JP 6.1/6.2 (Py3.10, aarch64)
+pip install https://github.com/ultralytics/assets/releases/download/v0.0.0/torch-2.5.0a0+872d972e41.nv24.08-cp310-cp310-linux_aarch64.whl
+pip install https://github.com/ultralytics/assets/releases/download/v0.0.0/torchvision-0.20.0a0+afc54f7-cp310-cp310-linux_aarch64.whl
+
+# Quick check (import may fail before Step [4] due to cuSPARSELt missing)
+python - << 'PY'
+import torch, platform
+print("torch =", torch.__version__)
+print("cuda_available =", torch.cuda.is_available())
+print("python =", platform.python_version())
+PY
+
+=============================================
+[4] Install cuSPARSELt (needed for torch 2.5)
+=============================================
+wget https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2204/arm64/cuda-keyring_1.1-1_all.deb
+sudo dpkg -i cuda-keyring_1.1-1_all.deb
+sudo apt-get update
+sudo apt-get -y install libcusparselt0 libcusparselt-dev
+sudo ldconfig
+
+# Verify torch again
+python - << 'PY'
+import torch, platform
+print("torch =", torch.__version__)
+print("cuda_available =", torch.cuda.is_available())
+print("python =", platform.python_version())
+PY
+
+==============================================
+[5] Install onnxruntime-gpu (optional, for ONNX path)
+==============================================
+# Optional: only needed if you plan ONNX inference or validation.
+pip install https://github.com/ultralytics/assets/releases/download/v0.0.0/onnxruntime_gpu-1.20.0-cp310-cp310-linux_aarch64.whl
+
+# ORT may change numpy version; pin it to 1.23.5
+pip install --upgrade --force-reinstall "numpy==1.23.5"
+
+# Check providers
+python - << 'PY'
+import onnxruntime as ort, numpy as np
+print("onnxruntime =", ort.__version__)
+print("providers   =", ort.get_available_providers())
+print("numpy       =", np.__version__)
+PY
+
+==================================================
+[6] Install GStreamer runtime + Python GI bindings
+==================================================
+sudo apt update
+sudo apt install -y gstreamer1.0-tools gstreamer1.0-plugins-base \
+  gstreamer1.0-plugins-good gstreamer1.0-plugins-bad gstreamer1.0-plugins-ugly \
+  gstreamer1.0-libav libgstreamer1.0-0 libgstreamer-plugins-base1.0-0 \
+  python3-gi python3-gi-cairo gir1.2-gst-plugins-base-1.0 gir1.2-gstreamer-1.0
+
+# Quick plugin sanity check
+gst-inspect-1.0 nvarguscamerasrc | head -n 5 || true
+gst-inspect-1.0 nvvidconv | head -n 5 || true
+
+====================================================
+[7] YOLO smoke test — image inference (network check)
+====================================================
+python - << 'PY'
+from ultralytics import YOLO
+m = YOLO('yolov8n.pt')   # or yolov11n.pt
+r = m.predict(source='https://ultralytics.com/images/bus.jpg', imgsz=640, save=True)
+print("result saved to:", r[0].path, " speed(ms):", r[0].speed)
+PY
+
+
+------------------------------------------------------
+[7.5] Activate CSI camera pins via Jetson-IO (IMX219)
+------------------------------------------------------
+# If this is the first time you attach the IMX219 (24‑pin) camera, enable it in Jetson‑IO:
+sudo /opt/nvidia/jetson-io/jetson-io.py
+
+# In the menu:
+#  • Select: "Configure 24‑pin camera"
+#  • Choose: "Camera IMX219 Dual"   (use Single if you have one module)
+#  • Save and apply pin configuration
+# Reboot to apply device‑tree changes:
+sudo reboot
+
+====================================================
+[8] IMX219 (CSI) camera bare preview via GStreamer
+====================================================
+# If the camera is busy or not found, restart argus service:
+sudo systemctl restart nvargus-daemon
+
+# Live preview (choose a sink that exists: nveglglessink / nv3dsink / nvdrmvideosink)
+gst-launch-1.0 nvarguscamerasrc ! \
+ 'video/x-raw(memory:NVMM),width=1920,height=1080,format=NV12,framerate=30/1' ! \
+ nvvidconv ! nveglglessink -e
+
+# Save to MP4 (H.264 hardware encode)
+gst-launch-1.0 nvarguscamerasrc ! \
+ 'video/x-raw(memory:NVMM),width=1280,height=720,format=NV12,framerate=30/1' ! \
+ nvv4l2h264enc maxperf-enable=1 bitrate=6000000 ! h264parse ! qtmux ! \
+ filesink location=csi_720p.mp4 -e
+
+# Ensure your user is in the "video" group for camera access
+sudo gpasswd -a $USER video && newgrp video
+
+
+==================================
+[9] TensorRT acceleration — ENGINE-FIRST (RECOMMENDED)
+==================================
+# This replaces the previous TensorRT section. It uses the SYSTEM TensorRT (10.x) that ships with JetPack,
+# and avoids pip-installing any 'tensorrt-cu12' wheels.
+# Works with TRT 10.3 ~ 10.8+ (verify below).
+
+# A) Make TensorRT Python available inside your venv (or skip A if you use system Python only)
+sudo apt update
+sudo apt install -y python3-libnvinfer python3-libnvinfer-dev libnvinfer-bin libnvinfer-dev
+
+# If you're using a venv, expose system site-packages so cv2 / tensorrt can be found:
+echo "/usr/lib/python3/dist-packages" > ~/yoloenv/lib/python3.10/site-packages/_system_dist.pth
+
+# Verify TensorRT Python import & version (expect something like 10.x.y; don't downgrade)
+python - << 'PY'
+import tensorrt as trt
+print("TensorRT Python =", trt.__version__)
+PY
+
+# B) Pin ONNX/Protobuf for a stable export toolchain
+pip uninstall -y onnx onnxslim onnxsim ml_dtypes || true
+pip install "protobuf==3.20.3" "onnx==1.14.1"
+
+# C) Prevent Ultralytics from pulling extra deps (especially pip tensorrt)
+export ULTRALYTICS_REQUIREMENTS=0
+
+# D) Export TensorRT engine (FP16 recommended). Adjust MODEL path as needed.
+python - << 'PY'
+from ultralytics import YOLO
+import os
+MODEL = os.path.expanduser("~/best.pt")   # e.g., ~/models/ppe/best.pt
+IMGSZ = 640
+m = YOLO(MODEL)
+engine = m.export(format="engine", device=0, half=True, imgsz=IMGSZ,
+                  simplify=False, optimize=False)
+print("engine saved at:", engine)
+PY
+
+====================
+[10] After reboot
+====================
+# Re-activate venv before running Python (if you use one):
+source ~/yoloenv/bin/activate
+
+# If camera doesn't open, restart nvargus and confirm plugins:
+sudo systemctl restart nvargus-daemon
+gst-inspect-1.0 nvarguscamerasrc | head -n 5 || true
+gst-inspect-1.0 nvvidconv | head -n 5 || true
+
+# Done. You now have Ultralytics + Torch + GStreamer and an ENGINE-FIRST TensorRT flow on JetPack 6.x.
