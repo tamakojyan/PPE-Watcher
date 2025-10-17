@@ -1,7 +1,16 @@
 # 🦺 PPE-WATCHER
 
 PPE-WATCHER is an AI-based Personal Protective Equipment (PPE) detection and monitoring system built with YOLOv8, Fastify, Prisma, React, and SQLite.  
-It detects helmets, masks, vests, and gloves in real time using an edge device such as NVIDIA Jetson or Raspberry Pi, then uploads violation data to a Fastify backend for visualization on a React dashboard.
+It detects helmets, masks, vests, goggles, boots and gloves in real time using an edge device such as NVIDIA Jetson or Raspberry Pi, then uploads violation data to a Fastify backend for visualization on a React dashboard.
+Directory structure
+├── frontend/                     # Frontend project (React + TypeScript + MUI)
+├── backend/                      # Backend service (Node.js + Fastify + Prisma)
+├── documents/                    # Project documentation
+│   ├── ai-edge/                  # Edge device scripts and AI models
+|   ├──video_links.txt        # This file contains cloud links to demo and presentation           
+│   ├── PPE-WATCHER Frontend Functional Manual.docx
+│   └── PPE-WATCHER_User_Deployment_Manual_v1.1.docx
+For more detailed information, please refer to the deployment manual inside the documents folder.
 
 ---
 
