@@ -137,6 +137,7 @@ sudo systemctl restart nvargus-daemon
 ```
 
 If uploads fail, confirm that Jetson and backend are on the same Wi-Fi network.
+💡 To modify runtime parameters, please refer to Section 4.3.6 of the Deployment Manual.
 
 ---
 
